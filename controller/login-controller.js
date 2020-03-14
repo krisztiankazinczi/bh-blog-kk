@@ -5,9 +5,11 @@ const AUTH_COOKIE = 'authcookie';
 module.exports = class LoginController {
     get(req, res) {
         let error;
+        let successLogout;
         if (req.query.error === 'credentials') error = 'Error! Invalid Credentials';
         if (req.query.error === 'loginNeeded') error = 'Please login!';
-        res.render('login', {layout: 'main-login', error});
+        if (req.query.logout === 'successful') successLogout = 'Logout Successful';
+        res.render('login', {layout: 'main-login', error, successLogout});
     }
 
     post(req, res) {
@@ -25,10 +27,9 @@ module.exports = class LoginController {
 
     logout(req, res) {
         res.clearCookie(AUTH_COOKIE)
-        console.log(req.session.id)
-        authenticator.deleteSession(req.session.id)
-        
-        res.redirect('/login')
+        const logout = authenticator.deleteSession(req.session.id)
+        if (logout) res.redirect('/login?logout=successful')
+        else res.redirect('/admin')
     }
 }
 
