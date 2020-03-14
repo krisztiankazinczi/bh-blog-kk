@@ -1,0 +1,52 @@
+    <div class="col-12">
+          <div class="d-flex justify-content-center align-items-center vh-100" >
+              <div class="container">
+            
+                <form action="/login" method="POST">
+                <div class="form-group">
+                <div class="row mt-3">
+                        <div class="col-5 text-right">
+                            <label for="username">Username</label>
+                        </div>
+                        <div class="col-7">
+                            <input type="text" class="form-control w-50" id="username" name="username">
+                        </div>
+                    </div>
+                
+                
+                    <div class="row mt-3">
+                        <div class="col-5 text-right">
+                            <label for="pw">Password</label>
+                        </div>
+                        <div class="col-7">
+                            <input type="password" class="form-control w-50" id="pw" name="pw">
+                        </div>
+                    </div>
+                
+                
+                    <div class="row mt-3">
+                        <div class="col-5">
+                            
+                        </div>
+                        <div class="col-7">
+                            <input type="submit" class="btn btn-info text-white form-control w-50" value="Login">
+                        </div>
+                    </div>
+                    {{#if error}}
+                        <div class="row mt-3">
+                        <div class="col-5">
+                            
+                        </div>
+                        <div class="col-7">
+                            <p class="text-danger">{{error}}</p>
+                        </div>
+                    </div>
+                    {{/if}}
+                </form>
+                </div>
+              </div>
+              </div>
+            </div>
+              
+
+    </div>

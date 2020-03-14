@@ -1,5 +1,10 @@
 const express = require('express');
 const exphbs  = require('express-handlebars');
+
+const LoginController = require('./controller/login-controller')
+const AdminController = require('./controller/admin-controller')
+const BlogController = require('./controller/blog-controller')
+
 const app = express();
 const port = 3000;
 
@@ -11,17 +16,20 @@ app.set('view engine', 'handlebars');
 
 app.use(express.static('public'))
 
-const blogs = require('./model/posts.js')
 
 
 
+const loginController = new LoginController();
+const adminController = new AdminController();
+const blogController = new BlogController();
 
-app.get('/', (req, res) => {
-    res.render('post-list', {
-        title: 'Blog Title',
-        blogs: blogs
-    })
-})
+
+app.get('/', blogController.get);
+
+app.get('/login', loginController.get);
+app.post('/login', loginController.post);
+
+app.get('/admin', adminController.get);
 
 
 
