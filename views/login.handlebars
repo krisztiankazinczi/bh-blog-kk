@@ -2,8 +2,8 @@
           <div class="d-flex justify-content-center align-items-center vh-100" >
               <div class="container">
             
-                <form action="/login" method="POST">
-                <div class="form-group">
+                <form action="/login" method="POST" class="needs-validation" id="login-form">
+                <div class="form-group" id="form-container">
                 <div class="row mt-3">
                         <div class="col-5 text-right">
                             <label for="username">Username</label>
@@ -12,8 +12,6 @@
                             <input type="text" class="form-control w-50" id="username" name="username">
                         </div>
                     </div>
-                
-                
                     <div class="row mt-3">
                         <div class="col-5 text-right">
                             <label for="pw">Password</label>
@@ -22,8 +20,6 @@
                             <input type="password" class="form-control w-50" id="pw" name="pw">
                         </div>
                     </div>
-                
-                
                     <div class="row mt-3">
                         <div class="col-5">
                             
@@ -32,26 +28,14 @@
                             <input type="submit" class="btn btn-info text-white form-control w-50" value="Login">
                         </div>
                     </div>
-                    {{#if error}}
                         <div class="row mt-3">
                         <div class="col-5">
                             
                         </div>
                         <div class="col-7">
-                            <p class="text-danger">{{error}}</p>
+                            <p id="message-to-user" class="{{#if error}}text-danger{{/if}}{{#if successLogout}}text-success{{/if}}">{{#if error}}{{error}}{{/if}}{{#if successLogout}}{{successLogout}}{{/if}}</p>
                         </div>
                     </div>
-                    {{/if}}
-                    {{#if successLogout}}
-                        <div class="row mt-3">
-                        <div class="col-5">
-                            
-                        </div>
-                        <div class="col-7">
-                            <p class="text-success">{{successLogout}}</p>
-                        </div>
-                    </div>
-                    {{/if}}
                 </form>
                 </div>
               </div>
@@ -60,3 +44,49 @@
               
 
     </div>
+
+
+    <script>
+
+        // front-end validation of login form
+        const form = document.getElementById('login-form');
+        const messageToUser = document.getElementById('message-to-user')
+        
+        
+
+        form.addEventListener("submit", submitCredentials, true);
+
+        function submitCredentials(event) {
+            event.preventDefault();
+
+            const username = document.getElementById('username');
+            const password = document.getElementById('pw');
+
+            messageToUser.innerText = "";
+
+            if(messageToUser.className === 'text-success') {
+                messageToUser.classList.remove("text-success");
+                messageToUser.classList.add("text-danger");
+            } 
+            messageToUser.classList.add("text-danger"); 
+            
+            if(username.classList.contains("border-danger")) username.classList.remove("border-danger");
+            if(password.classList.contains("border-danger")) password.classList.remove("border-danger");
+            
+            if(username.value && !password.value) {
+                messageToUser.innerHTML = 'Please fill the password field too!';
+                password.classList.add("border-danger");
+            } 
+            else if(!username.value && password.value) {
+                messageToUser.innerHTML = 'Please fill the username field too!';
+                username.classList.add("border-danger");
+            } 
+            else if(!username.value && !password.value) {
+                messageToUser.innerHTML = 'Please fill both fields!';
+                password.classList.add("border-danger");
+                username.classList.add("border-danger");
+            } 
+            else form.submit();
+        }
+
+    </script>
