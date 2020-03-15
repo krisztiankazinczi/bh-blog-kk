@@ -9,7 +9,7 @@
                             <label for="username">Username</label>
                         </div>
                         <div class="col-7">
-                            <input type="text" class="form-control w-50" id="username" name="username">
+                            <input type="text" class="form-control w-50 {{#ifeq border "username"}}border-danger{{/ifeq}}{{#ifeq border "both"}}border-danger{{/ifeq}}" id="username" name="username" {{#if username}}value="{{username}}"{{/if}}>
                         </div>
                     </div>
                     <div class="row mt-3">
@@ -17,7 +17,7 @@
                             <label for="pw">Password</label>
                         </div>
                         <div class="col-7">
-                            <input type="password" class="form-control w-50" id="pw" name="pw">
+                            <input type="password" class="form-control w-50 {{#ifeq border "pw"}}border-danger{{/ifeq}}{{#ifeq border "both"}}border-danger{{/ifeq}}" id="pw" name="pw">
                         </div>
                     </div>
                     <div class="row mt-3">
@@ -52,8 +52,6 @@
         const form = document.getElementById('login-form');
         const messageToUser = document.getElementById('message-to-user')
         
-        
-
         form.addEventListener("submit", submitCredentials, true);
 
         function submitCredentials(event) {

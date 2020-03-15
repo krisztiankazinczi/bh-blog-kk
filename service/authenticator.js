@@ -8,9 +8,10 @@ class Authenticator {
     }
 
     authenticate(username, password) {
-        const user = users.find(u => u.username === username)
-        if (user && user.password === password) return user
-        else return false
+            const user = users.find(u => u.username === username)
+            if (!user) return 'not-found';
+            else if (user && user.password !== password) return 'inc-pw';
+            else if (user && user.password === password) return user 
     }
 
     registerSession(user) {
