@@ -27,7 +27,9 @@ const adminController = new AdminController();
 const blogController = new BlogController();
 
 
-app.get('/', authMiddleware, blogController.get);
+app.get('/postList', authMiddleware, blogController.get);
+app.get('/newPost', authMiddleware, blogController.getAddPost);
+app.post('/newPost', authMiddleware, blogController.post);
 
 app.get('/login', loginController.get);
 app.post('/login', loginController.post).bind(loginController);

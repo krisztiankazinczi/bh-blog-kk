@@ -1,0 +1,112 @@
+    <div class="col-12">
+          <div class="d-flex justify-content-center align-items-center vh-100" >
+              <div class="container">
+            
+                
+                <div class="row">
+                    <div class="col-4 text-right"></div>
+                    <div class="col-7">
+                        <h1>Create New Post</h1>
+                    </div>
+                </div>
+                <div class="row mt-5">
+                        <div class="col-3 text-right">
+                            <label for="post_title">Title</label>
+                        </div>
+                        <div class="col-7">
+                            <input type="text" class="w-75" id="post_title" name="post_title">
+                        </div>
+                    </div>
+                
+                
+                    <div class="row mt-4">
+                        <div class="col-3 text-right">
+                            <label for="content">Content</label>
+                        </div>
+                        <div class="col-7">
+                            <textarea class="w-75" rows="6" cols="50" name="content" id="content"></textarea>
+                        </div>
+                    </div>
+                    <div class="row mt-5">
+                        <div class="col-3 text-left">
+                            
+                        </div>
+                        <div class="col-7 w-75">
+                            <div class="row">
+                                <div class="col-3 text-left">
+                                    <a href="http://localhost:3000/admin"><input type="submit" class="btn btn-info text-white" value="Discard"></a>
+                                </div>
+                                <div class="col-4"></div>
+                                <div class="col-3 text-right">
+                                    <input type="submit" class="btn btn-info text-white" value="Publish" onclick="createPost()">
+                                </div>  
+                            </div>                       
+                        </div>
+                    </div>
+                    <div class="row mt-5">
+                        <p id="error-message" class="text-danger"></p>
+                    </div>
+    
+
+                </div>
+              </div>
+            </div>
+              
+
+    </div>
+
+
+
+    <script>
+        const url = "http://localhost:3000/newPost";
+
+        function createPost() {
+            const postTitle = document.getElementById('post_title').value;
+            const postContent = document.getElementById('content').value;
+            const errorMessage = document.getElementById('error-message');
+
+            if (!postTitle || postTitle.length < 5) errorMessage.innerText = "Error! Title is mandatory";
+            if (!postContent || postContent.length < 5) errorMessage.innerText = "Error! Content is mandatory";
+            if (!postContent && !postTitle || !postContent && postTitle.length < 5 || !postTitle && postContent.length < 5) errorMessage.innerText = "Error! Content is mandatory";
+
+            if (postTitle && postContent && postTitle.length >= 5 && postContent.length >= 5) {
+
+                const author = getAuthor();
+
+                const data = {post_title: postTitle, post_content: postContent, post_author: author}
+
+                fetch(url, {
+                    method: 'POST', 
+                    redirect: 'follow',
+				    headers: {
+      				'Content-Type': 'application/json'
+    			    },
+				    body: JSON.stringify(data)
+                })
+                .then( resp => {
+                    window.location = resp.url;
+                })
+            }
+
+            
+
+        }
+
+
+
+        /*function getCookies() {
+            document.cookie.split(';').forEach( item => {
+            const [key, value] = item.split('=')
+
+            if (key === "authcookie") return value;
+            
+        })
+        }   */
+
+        function getAuthor() {
+            return document.cookie.split('=')[1]
+        }
+
+
+
+    </script>
