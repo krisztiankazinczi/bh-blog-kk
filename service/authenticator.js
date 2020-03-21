@@ -1,5 +1,5 @@
-const users = require('../model/registered-users');
-const sessions = require('../model/sessions');
+const users = require('../App_Data/registered-users');
+const sessions = require('../App_Data/sessions');
 
 class Authenticator {
     

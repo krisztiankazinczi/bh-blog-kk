@@ -65,11 +65,11 @@
             const postContent = document.getElementById('content').value;
             const errorMessage = document.getElementById('error-message');
 
-            if (!postTitle || postTitle.length < 5) errorMessage.innerText = "Error! Title is mandatory";
-            if (!postContent || postContent.length < 5) errorMessage.innerText = "Error! Content is mandatory";
-            if (!postContent && !postTitle || !postContent && postTitle.length < 5 || !postTitle && postContent.length < 5) errorMessage.innerText = "Error! Content is mandatory";
+         //   if (!postTitle || postTitle.length < 5) errorMessage.innerText = "Error! Title is mandatory and the minimum length is 5 character!";
+          //  if (!postContent || postContent.length < 5) errorMessage.innerText = "Error! Content is mandatory and the minimum length of it is 5 characters!";
+           // if (!postContent && !postTitle || !postContent && postTitle.length < 5 || !postTitle && postContent.length < 5) errorMessage.innerText = "Error! Both Title and Content are mandatory and the minimum length of these are 5 characters!";
 
-            if (postTitle && postContent && postTitle.length >= 5 && postContent.length >= 5) {
+            //if (postTitle && postContent && postTitle.length >= 5 && postContent.length >= 5) {
 
                 const author = getAuthor();
 
@@ -84,10 +84,17 @@
 				    body: JSON.stringify(data)
                 })
                 .then( resp => {
-                    window.location = resp.url;
+                    console.log(resp)
+                    if (resp.url !== url) {
+                        resp.text();
+                    }
+                    else window.location = resp.url;   
                 })
-            }
-
+                .then( res => {
+                    if (res === 'Title') errorMessage.innerText = "Error! Title is mandatory and the minimum length is 5 character!"
+                })
+            
+            //}
             
 
         }
