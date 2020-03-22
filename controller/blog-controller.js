@@ -15,6 +15,16 @@ module.exports = class BlogController {
         });
     }
 
+    async getPost(req, res) {
+        const { id } = req.params;
+        const post = await postDAO.getPost(id)
+        res.render('read-post-view', {
+            layout: 'blog',
+            title: post[0].title,
+            post
+        })
+    }
+
     getAddPost(req, res) {
         const error = createErrorObjectForAddPost(req.query);
 

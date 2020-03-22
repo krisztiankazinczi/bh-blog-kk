@@ -1,24 +1,12 @@
-<div class="container-fluid bg-secondary">
+<div class="container-fluid bg-dark">
 {{#each blogs}}
 <div class="container">
-  <div class="row mt-5 rounded text-light bg-dark pt-2 pb-2">
-    <div class="col-3 text-left ">
-      <h4>Author: {{this.author}}</h4>
+  <div class="row bg-secondary text-light mb-2">
+    <div class="col-8 text-left bg-secondary p-2">
+      <h4><a href="http://localhost:3000/post/{{this.id}}">{{this.title}} (by: {{this.author}})</a></h4>
     </div>
-    <div class="col-6"></div>
-    <div class="col-3 text-right">
-        <h4>{{this.created_at}}</h4>
+    <div class="col-4 text-right bg-secondary p-2">
+      <h4>{{this.created_at}}</h4>
     </div>
-  </div>
-  <div class="row text-center rounded text-light bg-dark mt-1 pt-2 pb-2">
-      <div class="col-12">
-          <h4>{{this.title}}</h4>
-      </div>
-      
-  </div>
-  <div class="row rounded text-light bg-dark mt-1 p-3">
-      <p>{{this.content}}</p>
-  </div>
-</div>
 {{/each}}
 </div>

@@ -6,7 +6,7 @@ module.exports = class DB {
     get(sqlString, params) {
         return new Promise((resolve, reject) => {
             db.serialize(() => {
-                db.get(sqlString, [params], (err, result) => {
+                db.get(sqlString, params, (err, result) => {
                     if (err) {
                         reject(err);
                         return
