@@ -1,56 +1,64 @@
-const blogs = require('../App_Data/posts');
 const PostDAO = require('../dao/posts_dao');
+const NewPost = require('../utils/NewPost');
+const authenticator = require('../service/authenticator');
+const {validateNewPost} = require('./validation/new-post-validation');
 
 const postDAO = new PostDAO();
 
-let idGenerator = 4;
-
-class Post {
-    constructor(title, author, content) {
-        this.id = idGenerator++;
-        this.title = title;
-        this.author = author;
-        this.created_at = new Date().toLocaleString().split(',')[0];
-        this.content = content;
-    }
-}
 
 module.exports = class BlogController {
     async get(req, res) {
         res.render('post-list', {
+            layout: 'blog',
             title: 'Blog Title',
             blogs: await postDAO.getAllPosts()
         });
     }
-    //add new post
+
     getAddPost(req, res) {
-        res.render('add-new-post', {layout: 'main-login'});
+        const error = createErrorObjectForAddPost(req.query);
+
+        res.render('add-new-post', {
+            layout: 'main',
+            error
+        });
     }
 
-    // add new post
+
     async post(req, res) {
-        const {post_title, post_author, post_content} = req.body;
+        const {title, content} = req.body;
+        const author = authenticator.findUserBySession(req.cookies.ssid).username;
 
-        if (!post_title || post_title.length < 5) {
-            res.send('Title')
-            return
-        }
-        if (!post_content || post_content.length < 5) {
-            res.send('Content')
-            return
-        }
-        if (!post_content && !post_title || !post_content && post_title.length < 5 || !post_title && post_content.length < 5) {
-            res.send('Both')
-            return
-        }
-
-
-        if (post_title && post_content && post_title.length >= 5 && post_content.length >= 5 ) {
-            const newPost = new Post(post_title, post_author, post_content);
-            await postDAO.createPost([newPost.title, newPost.author, newPost.created_at, newPost.content]);
-            res.redirect('/postList')
-        } 
+        const validateForm = validateNewPost(title, content)
         
-        
+        if (validateForm) res.redirect(`/newPost?error=${validateForm[0]}&titleVal=${validateForm[1]}&contentVal=${validateForm[2]}`);
+        else {
+            const newPost = new NewPost(title, author, content);
+            await postDAO.createPost(newPost);
+            res.redirect('/postList')  
+        }
     }
+}
+
+
+/**
+ * 
+ * @param {req.query} query 
+ */
+function createErrorObjectForAddPost(query) {
+    const errorAndValue = {
+        title_content: false,
+        title: false,
+        titleValue: false,
+        content: false,
+        contentValue: false
+    }
+    if (query.error) {
+        if (query.error === 'title_content') errorAndValue.title_content = 'Error! Both Title and Content are mandatory and the minimum length of these are 5 characters!';
+        else if (query.error === 'title') errorAndValue.title = 'Error! Title is mandatory and the minimum length is 5 character!';
+        else if (query.error === 'content') errorAndValue.content = 'Error! Content is mandatory and the minimum length is 5 character!';
+        errorAndValue.titleValue = query.titleVal;
+        errorAndValue.contentValue = query.contentVal;
+    }
+    return errorAndValue;
 }

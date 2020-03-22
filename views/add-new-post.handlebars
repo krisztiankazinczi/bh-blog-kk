@@ -9,12 +9,13 @@
                         <h1>Create New Post</h1>
                     </div>
                 </div>
+                <form action="/newPost" method="POST" class="needs-validation" id="create-new-post">
                 <div class="row mt-5">
                         <div class="col-3 text-right">
-                            <label for="post_title">Title</label>
+                            <label for="title">Title</label>
                         </div>
                         <div class="col-7">
-                            <input type="text" class="w-75" id="post_title" name="post_title">
+                            <input type="text" class="w-75" id="title" name="title" {{#if error.titleValue}}value="{{error.titleValue}}"{{/if}}>
                         </div>
                     </div>
                 
@@ -24,27 +25,36 @@
                             <label for="content">Content</label>
                         </div>
                         <div class="col-7">
-                            <textarea class="w-75" rows="6" cols="50" name="content" id="content"></textarea>
+                            <textarea class="w-75" rows="6" cols="50" name="content" id="content">{{#if error.contentValue}}{{error.contentValue}}{{/if}}</textarea>
                         </div>
                     </div>
                     <div class="row mt-5">
                         <div class="col-3 text-left">
                             
                         </div>
-                        <div class="col-7 w-75">
+                        <div class="col-7">
                             <div class="row">
                                 <div class="col-3 text-left">
-                                    <a href="http://localhost:3000/admin"><input type="submit" class="btn btn-info text-white" value="Discard"></a>
+                                    <a href="http://localhost:3000/admin"><input class="btn btn-info text-white" value="Discard"></a>
                                 </div>
                                 <div class="col-4"></div>
                                 <div class="col-3 text-right">
-                                    <input type="submit" class="btn btn-info text-white" value="Publish" onclick="createPost()">
+                                    <input type="submit" class="btn btn-info text-white" value="Publish">
                                 </div>  
                             </div>                       
                         </div>
                     </div>
+                </form>
                     <div class="row mt-5">
-                        <p id="error-message" class="text-danger"></p>
+                        <div class="col-3"></div>
+                        <div class="col-7">
+                            <p id="error-message-to-user" class="text-danger">
+                                {{#if error.title_content}}{{error.title_content}}{{/if}}
+                                {{#if error.title}}{{error.title}}{{/if}}
+                                {{#if error.content}}{{error.content}}{{/if}}
+                            </p>
+                        </div>
+                        
                     </div>
     
 
@@ -58,62 +68,23 @@
 
 
     <script>
-        const url = "http://localhost:3000/newPost";
+/*
+        const form = document.getElementById('create-new-post');
+        const errorMessageToUser  = document.getElementById('error-message-to-user');
 
-        function createPost() {
-            const postTitle = document.getElementById('post_title').value;
-            const postContent = document.getElementById('content').value;
-            const errorMessage = document.getElementById('error-message');
+        form.addEventListener("submit", createNewPost, true);
 
-         //   if (!postTitle || postTitle.length < 5) errorMessage.innerText = "Error! Title is mandatory and the minimum length is 5 character!";
-          //  if (!postContent || postContent.length < 5) errorMessage.innerText = "Error! Content is mandatory and the minimum length of it is 5 characters!";
-           // if (!postContent && !postTitle || !postContent && postTitle.length < 5 || !postTitle && postContent.length < 5) errorMessage.innerText = "Error! Both Title and Content are mandatory and the minimum length of these are 5 characters!";
+        function createNewPost(event) {
+            event.preventDefault();
 
-            //if (postTitle && postContent && postTitle.length >= 5 && postContent.length >= 5) {
+            const title = document.getElementById('title').value;
+            const content = document.getElementById('content').value;
 
-                const author = getAuthor();
-
-                const data = {post_title: postTitle, post_content: postContent, post_author: author}
-
-                fetch(url, {
-                    method: 'POST', 
-                    redirect: 'follow',
-				    headers: {
-      				'Content-Type': 'application/json'
-    			    },
-				    body: JSON.stringify(data)
-                })
-                .then( resp => {
-                    console.log(resp)
-                    if (resp.url !== url) {
-                        resp.text();
-                    }
-                    else window.location = resp.url;   
-                })
-                .then( res => {
-                    if (res === 'Title') errorMessage.innerText = "Error! Title is mandatory and the minimum length is 5 character!"
-                })
-            
-            //}
-            
-
+            errorMessageToUser.innerText = "";
+            if (!content && !title || !content && title.length < 5 || !title && content.length < 5) errorMessageToUser.innerText = "Error! Both Title and Content are mandatory and the minimum length of these are 5 characters!";
+            else if (!title || title.length < 5) errorMessageToUser.innerText = "Error! Title is mandatory and the minimum length is 5 character!";
+            else if (!content || content.length < 5) errorMessageToUser.innerText = "Error! Content is mandatory and the minimum length of it is 5 characters!";
+            else form.submit();
         }
-
-
-
-        /*function getCookies() {
-            document.cookie.split(';').forEach( item => {
-            const [key, value] = item.split('=')
-
-            if (key === "authcookie") return value;
-            
-        })
-        }   */
-
-        function getAuthor() {
-            return document.cookie.split('=')[1]
-        }
-
-
-
+        */
     </script>

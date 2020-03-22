@@ -1,5 +1,5 @@
 const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('./App_Data/posts.db');
+const db = new sqlite3.Database('./data/posts.db');
 
 module.exports = class DB {
 
@@ -31,11 +31,6 @@ module.exports = class DB {
         })
     }
 
-    /**
-     * 
-     * @param {String} sqlString 
-     * @param {[Post]} params 
-     */
     run(sqlString, params) {
         return new Promise((resolve, reject) => {
             db.serialize(() => {

@@ -1,6 +1,6 @@
 const authenticator = require('../service/authenticator');
 
-const AUTH_COOKIE = 'authcookie';
+const AUTH_COOKIE = 'ssid';
 
 module.exports = class LoginController {
     get(req, res) {
@@ -9,7 +9,7 @@ module.exports = class LoginController {
         if (req.query.error === 'credentials') error = 'Error! Invalid Credentials';
         if (req.query.error === 'loginNeeded') error = 'Please login!';
         if (req.query.logout === 'successful') successLogout = 'Logout Successful';
-        res.render('login', {layout: 'main-login', error, successLogout});
+        res.render('login', {layout: 'main', error, successLogout});
     }
 
     post(req, res) {

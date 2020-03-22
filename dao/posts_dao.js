@@ -1,4 +1,4 @@
-const DB = require('../service/db-service');
+const DB = require('./db-wrapper');
 
 const db = new DB();
 
@@ -13,10 +13,10 @@ module.exports = class PostsDAO {
         }
     }
 
-    async createPost(values) {
+    async createPost(newPost) {
         const sqlcreateNewPost = 'INSERT INTO posts(title, author, created_at, content) VALUES (?,?,?,?)';
         try {
-            await db.run(sqlcreateNewPost, values)
+            await db.run(sqlcreateNewPost, [newPost.title, newPost.author, newPost.created_at, newPost.content])
         } catch (error) {
             console.error(error);
         }

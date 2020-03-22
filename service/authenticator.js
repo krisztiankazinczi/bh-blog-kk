@@ -1,5 +1,8 @@
-const users = require('../App_Data/registered-users');
-const sessions = require('../App_Data/sessions');
+const users = require('../data/registered-users');
+const sessions = require('../data/sessions');
+const uid = require('uid-safe')
+
+const SSID_LENGTH = 18;
 
 class Authenticator {
     
@@ -14,7 +17,7 @@ class Authenticator {
     }
 
     registerSession(user) {
-        const session = { id: user.username, user }
+        const session = {id: uid.sync(SSID_LENGTH), user}
         sessions.push(session);
         return session
     }
@@ -25,6 +28,11 @@ class Authenticator {
             sessions.splice(idx, 1)
             return true
         } return false
+    }
+
+    findUserBySession(ssid) {
+        const session = sessions.find(s => s.id === ssid)
+        return session.user;
     }
 
 }

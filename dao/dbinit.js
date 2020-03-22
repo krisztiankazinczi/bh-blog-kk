@@ -1,5 +1,5 @@
 const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('../App_Data/posts.db')
+const db = new sqlite3.Database('../data/posts.db')
 
 const posts = require('../App_Data/posts')
 
