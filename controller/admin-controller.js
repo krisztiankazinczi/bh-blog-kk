@@ -28,8 +28,18 @@ module.exports = class AdminController {
     async updatePost(req, res) {
         const id = req.params.id;
         const { title, slug, content } = req.body;
-        await postDAO.updatePost(title, slug, content, id)
-        res.redirect('/adminPostList')
+        
+        await postDAO.updatePost(title, slug, new Date().toLocaleString().split(',')[0], content, id)
+        res.redirect('/postList')
+        //(draft) ? res.redirect('/adminPostList') : res.redirect('/postList');
+        
+    }
+
+    async saveAsDraft(req, res) {
+        const id = req.params.id;
+        const { title, slug, content} = req.body;
+        await postDAO.updatePostAsDraft(title, slug, new Date().toLocaleString().split(',')[0], content, id)
+        res.redirect('/adminPostList');
     }
 }
 

@@ -49,6 +49,14 @@ module.exports = class BlogController {
             res.redirect('/postList')  
         }
     }
+
+    async draft(req, res) {
+        const {title, slug, content} = req.body;
+        const author = authenticator.findUserBySession(req.cookies.ssid).username;
+        const newPost = new NewPost(title, slug, author, content);
+        await postDAO.createDraft(newPost);
+        res.redirect('/postList'); 
+    }
 }
 
 

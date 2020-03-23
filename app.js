@@ -31,6 +31,7 @@ app.get('/postList', authMiddleware, blogController.get);
 app.get('/post/:idOrSlug', authMiddleware, blogController.getPost);
 app.get('/newPost', authMiddleware, blogController.getAddPost);
 app.post('/newPost', authMiddleware, blogController.post);
+app.post('/draft', authMiddleware, blogController.draft);
 
 app.get('/login', loginController.get);
 app.post('/login', loginController.post).bind(loginController);
@@ -39,6 +40,7 @@ app.get('/admin', authMiddleware, adminController.getDashboard);
 app.get('/adminPostList', authMiddleware, adminController.getPosts);
 app.get('/editPost/:id', authMiddleware, adminController.getPost);
 app.post('/updatePost/:id', authMiddleware, adminController.updatePost);
+app.post('/saveAsDraft/:id', authMiddleware, adminController.saveAsDraft);
 
 app.get('/logout', authMiddleware, loginController.logout)
 

@@ -46,12 +46,14 @@
                     </div>
                     <div class="col-7">
                         <div class="row">
-                            <div class="col-3 text-left">
-                                <a href="http://localhost:3000/admin"><input class="btn btn-info text-white"
+                            <div class="col-3 text-center">
+                                <a href="http://localhost:3000/admin"><input class="btn btn-info text-white w-75"
                                         value="Discard"></a>
                             </div>
-                            <div class="col-4"></div>
-                            <div class="col-3 text-right">
+                            <div class="col-4 text-center">
+                                <input id="save-draft" class="btn btn-info text-white w-75" value="Save as draft">
+                            </div>
+                            <div class="col-3 text-left">
                                 <input type="submit" class="btn btn-info text-white" value="Publish">
                             </div>
                         </div>
@@ -138,6 +140,25 @@
             .replace(/-+$/, ""); // trim - from end of text
 
         return str;
+    }
+
+
+    document.getElementById('save-draft').addEventListener('click', saveAsDraft);
+
+    function saveAsDraft() {
+        const url = 'http://localhost:3000';
+        const data = { title: document.getElementById('title').value, slug: document.getElementById('slug').value, content: document.getElementById('content').value }
+
+        fetch(`${url}/draft`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then( res => {
+            window.location = res.url;
+        })
     }
 
 </script>
