@@ -1,24 +1,24 @@
 <div class="container-fluid bg-secondary vh-100">
 <div class="container">
-{{#each post}}
+
   <div class="row mt-5 rounded text-light bg-dark pt-2 pb-2">
     <div class="col-3 text-left ">
-      <h4>Author: {{this.author}}</h4>
+      <h4>Author: {{post.author}}</h4>
     </div>
     <div class="col-6"></div>
     <div class="col-3 text-right">
-        <h4>{{this.created_at}}</h4>
+        <h4>{{post.created_at}}</h4>
     </div>
   </div>
   <div class="row text-center rounded text-light bg-dark mt-1 pt-2 pb-2">
       <div class="col-12">
-          <h4>{{this.title}}</h4>
+          <h4>{{post.title}}</h4>
       </div>
       
   </div>
   <div class="row rounded text-light bg-dark mt-1 p-3">
-      <p>{{this.content}}</p>
+      <p>{{post.content}}</p>
   </div>
 </div>
-{{/each}}
+
 </div>

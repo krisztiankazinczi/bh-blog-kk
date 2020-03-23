@@ -28,7 +28,7 @@ const blogController = new BlogController();
 
 
 app.get('/postList', authMiddleware, blogController.get);
-app.get('/post/:id', authMiddleware, blogController.getPost);
+app.get('/post/:idOrSlug', authMiddleware, blogController.getPost);
 app.get('/newPost', authMiddleware, blogController.getAddPost);
 app.post('/newPost', authMiddleware, blogController.post);
 

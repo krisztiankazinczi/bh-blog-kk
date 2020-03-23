@@ -16,11 +16,12 @@ module.exports = class BlogController {
     }
 
     async getPost(req, res) {
-        const { id } = req.params;
-        const post = await postDAO.getPost(id)
+        let { idOrSlug } = req.params;
+        const post = (isNaN(+idOrSlug)) ? await postDAO.getPostBySlug(idOrSlug) : await postDAO.getPostById(idOrSlug);
+
         res.render('read-post-view', {
             layout: 'blog',
-            title: post[0].title,
+            title: post.title,
             post
         })
     }
@@ -36,14 +37,14 @@ module.exports = class BlogController {
 
 
     async post(req, res) {
-        const {title, content} = req.body;
+        const {title, content, slug} = req.body;
         const author = authenticator.findUserBySession(req.cookies.ssid).username;
 
-        const validateForm = validateNewPost(title, content)
+        const validateForm = validateNewPost(title, slug, content)
         
-        if (validateForm) res.redirect(`/newPost?error=${validateForm[0]}&titleVal=${validateForm[1]}&contentVal=${validateForm[2]}`);
+        if (validateForm) res.redirect(`/newPost?error=${validateForm[0]}&titleVal=${validateForm[1]}&slugVal=${validateForm[2]}&contentVal=${validateForm[3]}`);
         else {
-            const newPost = new NewPost(title, author, content);
+            const newPost = new NewPost(title, slug, author, content);
             await postDAO.createPost(newPost);
             res.redirect('/postList')  
         }
@@ -57,17 +58,27 @@ module.exports = class BlogController {
  */
 function createErrorObjectForAddPost(query) {
     const errorAndValue = {
+        title_slug_content: false,
+        title_slug: false,
+        slug_content: false,
         title_content: false,
         title: false,
         titleValue: false,
+        slug: false,
+        slugValue: false,
         content: false,
         contentValue: false
     }
     if (query.error) {
-        if (query.error === 'title_content') errorAndValue.title_content = 'Error! Both Title and Content are mandatory and the minimum length of these are 5 characters!';
+        if (query.error === 'title_slug_content') errorAndValue.title_content = 'Error! Title, Slug and Content are mandatory and the minimum length of these are 5 characters!';
+        if (query.error === 'title_slug') errorAndValue.title_content = 'Error! Both Title and Slug are mandatory and the minimum length of these are 5 character!';
+        if (query.error === 'title_content') errorAndValue.title_content = 'Error! Both Title and Content are mandatory and the minimum length of these are 5 character!';
+        if (query.error === 'slug_content') errorAndValue.title_content = 'Error! Both Content and Slug are mandatory and the minimum length of these are 5 character!';
         else if (query.error === 'title') errorAndValue.title = 'Error! Title is mandatory and the minimum length is 5 character!';
+        else if (query.error === 'slug') errorAndValue.title = 'Error! Slug is mandatory and the minimum length is 5 character!';
         else if (query.error === 'content') errorAndValue.content = 'Error! Content is mandatory and the minimum length is 5 character!';
         errorAndValue.titleValue = query.titleVal;
+        errorAndValue.slugValue = query.slugVal;
         errorAndValue.contentValue = query.contentVal;
     }
     return errorAndValue;
