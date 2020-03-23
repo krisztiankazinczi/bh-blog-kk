@@ -41,4 +41,13 @@ module.exports = class PostsDAO {
             console.error(error);
         }
     }
+
+    async updatePost(title, slug, content, id) {
+        const sqlUpdatePost = 'UPDATE posts SET title = ?, slug = ?, content = ? WHERE id = ?'
+        try {
+            await db.run(sqlUpdatePost, [title, slug, content, id])
+        } catch (error) {
+            console.error(error);
+        }
+    }
 }

@@ -1,0 +1,48 @@
+<div class="table-responsive">
+        <table class="table table-striped table-bordered table-hover">
+            <thead>
+                <div class="row">
+                    <div class="col-3 w-100">
+                        <th class="align-middle text-center">Title</th>
+                    </div>
+                    <div class="col-3 w-100">
+                        <th class="align-middle text-center">Author</th>
+                    </div>
+                    <div class="col-3 w-100">
+                        <th class="align-middle text-center">Publish Date</th>
+                    </div>
+                    <div class="col-3 w-100">
+                        <th class="align-middle text-center">Operations</th>
+                    </div>
+                </div>
+            </thead>
+            <tbody>
+                {{#each posts}}
+                <div class="row">
+                    <tr>
+                        <div class="col-3">
+                            <td class="align-middle text-center">{{this.title}}</td>
+                        </div>
+                        <div class="col-3">
+                            <td class="align-middle text-center">{{this.author}}</td>
+                        </div>
+                        <div class="col-3">
+                            <td class="align-middle text-center">{{this.created_at}}</td>
+                        </div>
+                        <div class="col-3">
+                            <td class="align-middle text-center"><a href="http://localhost:3000/editPost/{{this.id}}"><button class="btn btn-info">Edit</button></a></td>
+                        </div>
+                    </tr>
+                </div>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+
+
+
+
+
+
+
+    
