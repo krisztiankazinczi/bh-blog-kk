@@ -38,6 +38,7 @@ module.exports = class AdminController {
     async saveAsDraft(req, res) {
         const id = req.params.id;
         const { title, slug, content} = req.body;
+        console.log(title, slug, content, id)
         await postDAO.updatePostAsDraft(title, slug, new Date().toLocaleString().split(',')[0], content, id)
         res.redirect('/adminPostList');
     }

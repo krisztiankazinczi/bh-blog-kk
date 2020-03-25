@@ -63,7 +63,7 @@ module.exports = class PostsDAO {
     async updatePostAsDraft(title, slug, created_at, content, id) {
         const sqlSavePostAsDraft = 'UPDATE posts SET title = ?, slug = ?, created_at = ?, content = ?, draft = ? WHERE id = ?'
         try {
-            await db.run(sqlSavePostAsDraft, [title, slug, created_at, content, 1, id])
+            await db.run(sqlSavePostAsDraft, [title, slug, created_at, content, "1", id])
         } catch (error) {
             console.error(error);
         }
