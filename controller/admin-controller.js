@@ -1,10 +1,12 @@
 const BlogPostService = require('../service/blog-post-service')
 const authenticator = require('../service/authenticator');
 const NewPost = require('../utils/NewPost');
-const blogPostService = new BlogPostService();
-
 
 module.exports = class AdminController {
+    constructor(blogPostService) {
+        this.blogPostService = blogPostService
+    }
+    
     getDashboard(req,res) {
         res.render('admin', {layout: 'main'})
     }
@@ -13,19 +15,19 @@ module.exports = class AdminController {
         res.render('admin-post-list', {
             layout: 'blog',
             title: 'Blog Title',
-            posts: await blogPostService.findAllPosts(),
-            archive: await blogPostService.createArchive()
+            posts: await this.blogPostService.findAllPosts(),
+            archive: await this.blogPostService.createArchive()
         });
     }
 
     async getPost(req, res) {
         const id = req.params.id;
-        const post = await blogPostService.findPostById(id);
+        const post = await this.blogPostService.findPostById(id);
         res.render('admin-edit-post', {
             layout: 'blog',
             title: post.title,
             post,
-            archive: await blogPostService.createArchive()
+            archive: await this.blogPostService.createArchive()
         })
     }
 
@@ -36,7 +38,7 @@ module.exports = class AdminController {
 
         const updatedPost = new NewPost(title, slug, author, content);
         
-        (draft) ? await blogPostService.updatePostAsDraft(updatedPost, id) : await blogPostService.updatePost(updatedPost, id);
+        (draft) ? await this.blogPostService.updatePostAsDraft(updatedPost, id) : await this.blogPostService.updatePost(updatedPost, id);
         res.redirect('/adminPostList')   
     }
 }

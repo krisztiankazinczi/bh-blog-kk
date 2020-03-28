@@ -31,19 +31,19 @@ const loginController = new LoginController();
 const adminController = new AdminController( new BlogPostService( new PostRepository( new DB() ) ) );
 const blogController = new BlogController( new BlogPostService( new PostRepository( new DB() ) ) );
 
-app.get('/postList', blogController.get);
-app.get('/post/:idOrSlug', blogController.getPost);
-app.get('/newPost', authMiddleware, blogController.getAddPost);
-app.post('/newPost', authMiddleware, blogController.post);
-app.post('/draft', authMiddleware, blogController.draft);
+app.get('/postList', blogController.get.bind(blogController));
+app.get('/post/:idOrSlug', blogController.getPost.bind(blogController));
+app.get('/newPost', authMiddleware, blogController.getAddPost.bind(blogController));
+app.post('/newPost', authMiddleware, blogController.post.bind(blogController));
+app.post('/draft', authMiddleware, blogController.draft.bind(blogController));
 
 app.get('/login', loginController.get);
 app.post('/login', loginController.post).bind(loginController);
 
 app.get('/admin', authMiddleware, adminController.getDashboard);
-app.get('/adminPostList', authMiddleware, adminController.getPosts);
-app.get('/editPost/:id', authMiddleware, adminController.getPost);
-app.post('/updatePost/:id', authMiddleware, adminController.updatePost);
+app.get('/adminPostList', authMiddleware, adminController.getPosts.bind(adminController));
+app.get('/editPost/:id', authMiddleware, adminController.getPost.bind(adminController));
+app.post('/updatePost/:id', authMiddleware, adminController.updatePost.bind(adminController));
 
 app.get('/logout', authMiddleware, loginController.logout)
 

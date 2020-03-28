@@ -1,7 +1,5 @@
 const PostRepository = require('../repository/posts_repository');
 
-// const postRepository = new PostRepository();
-
 class BlogPostService {
     constructor(postRepository) {
         this.postRepository = postRepository;
@@ -40,45 +38,48 @@ class BlogPostService {
     }
 
     async createArchive() {
-        return await getArchive();
+        return await this.getArchive();
+    }
+
+
+    async getArchive() {
+        try {
+            const result = await this.postRepository.findAllPosts();
+            const archive = {};
+            result.forEach((row, index) => {
+                if (!row.published_at) return
+                
+                const date = new Date(row.published_at);
+                const year = date.getFullYear();
+                const month = months[date.getMonth()];
+    
+                if (index === 0) {
+                    archive[year] = {}
+                    archive[year][month] = [{id: row.id, title: row.title}]
+                    return;
+                } 
+                archive[year] = archive[year] || {}
+    
+                if (!archive[year][month]) {
+                    archive[year][month] = [{id: row.id, title: row.title}]
+                    return;
+                } 
+                    
+                archive[year][month].push({id: row.id, title: row.title});
+                
+            })
+            return archive
+        } catch (error) {
+            console.log(error)
+        }
+        
     }
 }
 
 const months = [ "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December" ];
 
-async function getArchive() {
-    try {
-        const result = await postRepository.findAllPosts();
-        const archive = {};
-        result.forEach((row, index) => {
-            if (!row.published_at) return
-            
-            const date = new Date(row.published_at);
-            const year = date.getFullYear();
-            const month = months[date.getMonth()];
 
-            if (index === 0) {
-                archive[year] = {}
-                archive[year][month] = [{id: row.id, title: row.title}]
-                return;
-            } 
-            archive[year] = archive[year] || {}
-
-            if (!archive[year][month]) {
-                archive[year][month] = [{id: row.id, title: row.title}]
-                return;
-            } 
-                
-            archive[year][month].push({id: row.id, title: row.title});
-            
-        })
-        return archive
-    } catch (error) {
-        console.log(error)
-    }
-    
-}
 
 
 

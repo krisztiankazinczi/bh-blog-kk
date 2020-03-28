@@ -3,8 +3,6 @@ const NewPost = require('../utils/NewPost');
 const authenticator = require('../service/authenticator');
 const {validateNewPost} = require('./validation/new-post-validation');
 
-// const blogPostService = new BlogPostService();
-
 
 module.exports = class BlogController {
     constructor(blogPostService) {
