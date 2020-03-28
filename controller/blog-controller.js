@@ -8,6 +8,20 @@ const blogPostService = new BlogPostService();
 
 module.exports = class BlogController {
     async get(req, res) {
+        const { searchFor } = req.query;
+
+        const blogs = (searchFor) ? await blogPostService.findSearchedFor(searchFor) : await blogPostService.findAllPosts()
+        res.render('post-list', {
+            layout: 'blog',
+            title: 'Blog Title',
+            blogs: blogs,
+            archive: await blogPostService.createArchive()
+        });
+    }
+
+    async searchedPosts(req, res) {
+        const { searchFor } = req.body;
+
         res.render('post-list', {
             layout: 'blog',
             title: 'Blog Title',

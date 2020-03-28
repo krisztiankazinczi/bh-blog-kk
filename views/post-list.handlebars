@@ -1,5 +1,11 @@
 <div class="container-fluid bg-dark">
   <div class="pt-3">
+    <div class="container">
+      <form action="/postList" method="GET" class="pb-3">
+        <input type="text" placeholder="Search.." class="w-50" name="searchFor"> <input class="btn btn-secondary ml-3" type="submit" value="Search">
+      </form>
+    </div>
+
     {{#each blogs}}
     {{#unless this.draft}}
     <div class="container">

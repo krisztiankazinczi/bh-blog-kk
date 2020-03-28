@@ -14,6 +14,16 @@ module.exports = class PostRepository {
         }
     }
 
+    async findSearchedFor(searchFor) {
+        const sqlGetAllFilteredPosts = `SELECT id, title, slug, author, last_modified_at, published_at, content, draft FROM posts WHERE content LIKE '%${searchFor}%' OR title LIKE '%${searchFor}%'`
+        try {
+            const post = await db.allString(sqlGetAllFilteredPosts, [searchFor]);
+            return post;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
     async findPostById(id) {
         const sqlGetPostById = 'SELECT id, title, slug, author, last_modified_at, published_at, content, draft FROM posts WHERE id = ?'
         try {

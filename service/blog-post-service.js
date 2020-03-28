@@ -7,6 +7,10 @@ class BlogPostService {
         return postRepository.findAllPosts();
     }
 
+    findSearchedFor(searchFor) {
+        return postRepository.findSearchedFor(searchFor);
+    }
+
     findPostById(id) {
         return postRepository.findPostById(id);
     }
