@@ -1,9 +1,14 @@
 const express = require('express');
 const exphbs  = require('express-handlebars');
 
+const DB = require('./repository/db-wrapper');
+const PostRepository = require('./repository/posts_repository')
+const BlogPostService = require('./service/blog-post-service')
+const BlogController = require('./controller/blog-controller')
+
 const LoginController = require('./controller/login-controller')
 const AdminController = require('./controller/admin-controller')
-const BlogController = require('./controller/blog-controller')
+
 const authMiddleware = require('./middlewares/authMiddleware')
 
 const app = express();
@@ -23,9 +28,8 @@ app.use(express.static('public'))
 
 
 const loginController = new LoginController();
-const adminController = new AdminController();
-const blogController = new BlogController();
-
+const adminController = new AdminController( new BlogPostService( new PostRepository( new DB() ) ) );
+const blogController = new BlogController( new BlogPostService( new PostRepository( new DB() ) ) );
 
 app.get('/postList', blogController.get);
 app.get('/post/:idOrSlug', blogController.getPost);

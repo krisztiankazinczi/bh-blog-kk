@@ -31,19 +31,6 @@ module.exports = class DB {
         })
     }
 
-    allString(sqlString) {
-        return new Promise((resolve, reject) => {
-            db.serialize(() => {
-                db.all(sqlString, (err, results) => {
-                    if (err) {
-                        reject(err);
-                        return
-                    }
-                    resolve(results)
-                })
-            })
-        })
-    }
 
     run(sqlString, params) {
         return new Promise((resolve, reject) => {

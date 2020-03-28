@@ -3,42 +3,35 @@ const NewPost = require('../utils/NewPost');
 const authenticator = require('../service/authenticator');
 const {validateNewPost} = require('./validation/new-post-validation');
 
-const blogPostService = new BlogPostService();
+// const blogPostService = new BlogPostService();
 
 
 module.exports = class BlogController {
+    constructor(blogPostService) {
+        this.blogPostService = blogPostService;
+    }
+
     async get(req, res) {
         const { searchFor } = req.query;
 
-        const blogs = (searchFor) ? await blogPostService.findSearchedFor(searchFor) : await blogPostService.findAllPosts()
+        const blogs = (searchFor) ? await this.blogPostService.findSearchedFor(searchFor) : await this.blogPostService.findAllPosts()
         res.render('post-list', {
             layout: 'blog',
             title: 'Blog Title',
             blogs: blogs,
-            archive: await blogPostService.createArchive()
-        });
-    }
-
-    async searchedPosts(req, res) {
-        const { searchFor } = req.body;
-
-        res.render('post-list', {
-            layout: 'blog',
-            title: 'Blog Title',
-            blogs: await blogPostService.findAllPosts(),
-            archive: await blogPostService.createArchive()
+            archive: await this.blogPostService.createArchive()
         });
     }
 
     async getPost(req, res) {
         const { idOrSlug } = req.params;
-        const post = (isNaN(+idOrSlug)) ? await blogPostService.findPostBySlug(idOrSlug) : await blogPostService.findPostById(idOrSlug);
+        const post = (isNaN(+idOrSlug)) ? await this.blogPostService.findPostBySlug(idOrSlug) : await this.blogPostService.findPostById(idOrSlug);
 
         res.render('read-post-view', {
             layout: 'blog',
             title: post.title,
             post,
-            archive: await blogPostService.createArchive()
+            archive: await this.blogPostService.createArchive()
         })
     }
 
@@ -61,7 +54,7 @@ module.exports = class BlogController {
         if (validateForm) res.redirect(`/newPost?error=${validateForm[0]}&titleVal=${validateForm[1]}&slugVal=${validateForm[2]}&contentVal=${validateForm[3]}`);
         else {
             const newPost = new NewPost(title, slug, author, content);
-            await blogPostService.createPost(newPost);
+            await this.blogPostService.createPost(newPost);
             res.redirect('/postList')  
         }
     }
@@ -70,7 +63,7 @@ module.exports = class BlogController {
         const {title, slug, content} = req.body;
         const author = authenticator.findUserBySession(req.cookies.ssid).username;
         const newPost = new NewPost(title, slug, author, content);
-        await blogPostService.createDraft(newPost);
+        await this.blogPostService.createDraft(newPost);
         res.redirect('/adminPostList'); 
     }
 }

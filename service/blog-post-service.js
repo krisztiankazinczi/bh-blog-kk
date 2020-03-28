@@ -1,38 +1,42 @@
 const PostRepository = require('../repository/posts_repository');
 
-const postRepository = new PostRepository();
+// const postRepository = new PostRepository();
 
 class BlogPostService {
+    constructor(postRepository) {
+        this.postRepository = postRepository;
+    }
+
     findAllPosts() {
-        return postRepository.findAllPosts();
+        return this.postRepository.findAllPosts();
     }
 
     findSearchedFor(searchFor) {
-        return postRepository.findSearchedFor(searchFor);
+        return this.postRepository.findSearchedFor(searchFor);
     }
 
     findPostById(id) {
-        return postRepository.findPostById(id);
+        return this.postRepository.findPostById(id);
     }
 
     findPostBySlug(slug) {
-        return postRepository.findPostBySlug(slug);
+        return this.postRepository.findPostBySlug(slug);
     }
 
     createPost(newPost) {
-        return postRepository.createPost(newPost);
+        return this.postRepository.createPost(newPost);
     }
 
     createDraft(newPost) {
-        return postRepository.createDraft(newPost);
+        return this.postRepository.createDraft(newPost);
     }
 
     updatePost(updatedPost, id) {
-        return postRepository.updatePost(updatedPost, id);
+        return this.postRepository.updatePost(updatedPost, id);
     }
 
     updatePostAsDraft(updatedPost, id) {
-        return postRepository.updatePostAsDraft(updatedPost, id);
+        return this.postRepository.updatePostAsDraft(updatedPost, id);
     }
 
     async createArchive() {
