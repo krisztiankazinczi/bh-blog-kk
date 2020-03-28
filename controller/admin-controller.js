@@ -1,5 +1,7 @@
-const PostDAO = require('../dao/posts_dao');
-postDAO = new PostDAO();
+const BlogPostService = require('../service/blog-post-service')
+const authenticator = require('../service/authenticator');
+const NewPost = require('../utils/NewPost');
+const blogPostService = new BlogPostService();
 
 
 module.exports = class AdminController {
@@ -11,36 +13,31 @@ module.exports = class AdminController {
         res.render('admin-post-list', {
             layout: 'blog',
             title: 'Blog Title',
-            posts: await postDAO.getAllPosts()
+            posts: await blogPostService.findAllPosts(),
+            archive: await blogPostService.createArchive()
         });
     }
 
     async getPost(req, res) {
         const id = req.params.id;
-        const post = await postDAO.getPostById(id);
+        const post = await blogPostService.findPostById(id);
         res.render('admin-edit-post', {
             layout: 'blog',
             title: post.title,
-            post: post
+            post,
+            archive: await blogPostService.createArchive()
         })
     }
 
     async updatePost(req, res) {
         const id = req.params.id;
-        const { title, slug, content } = req.body;
-        
-        await postDAO.updatePost(title, slug, new Date().toLocaleString().split(',')[0], content, id)
-        res.redirect('/postList')
-        //(draft) ? res.redirect('/adminPostList') : res.redirect('/postList');
-        
-    }
+        const { title, slug, content, draft } = req.body;
+        const author = authenticator.findUserBySession(req.cookies.ssid).username;
 
-    async saveAsDraft(req, res) {
-        const id = req.params.id;
-        const { title, slug, content} = req.body;
-        console.log(title, slug, content, id)
-        await postDAO.updatePostAsDraft(title, slug, new Date().toLocaleString().split(',')[0], content, id)
-        res.redirect('/adminPostList');
+        const updatedPost = new NewPost(title, slug, author, content);
+        
+        (draft) ? await blogPostService.updatePostAsDraft(updatedPost, id) : await blogPostService.updatePost(updatedPost, id);
+        res.redirect('/adminPostList')   
     }
 }
 

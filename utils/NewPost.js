@@ -3,7 +3,8 @@ module.exports = class NewPost {
         this.title = title;
         this.slug = slug;
         this.author = author;
-        this.created_at = new Date().toLocaleString().split(',')[0];
+        this.last_modified_at = new Date().toLocaleString().split(',')[0];
+        this.published_at = new Date();
         this.content = content;
     }
 }

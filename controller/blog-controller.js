@@ -1,9 +1,9 @@
-const PostDAO = require('../dao/posts_dao');
+const BlogPostService = require('../service/blog-post-service')
 const NewPost = require('../utils/NewPost');
 const authenticator = require('../service/authenticator');
 const {validateNewPost} = require('./validation/new-post-validation');
 
-const postDAO = new PostDAO();
+const blogPostService = new BlogPostService();
 
 
 module.exports = class BlogController {
@@ -11,18 +11,20 @@ module.exports = class BlogController {
         res.render('post-list', {
             layout: 'blog',
             title: 'Blog Title',
-            blogs: await postDAO.getAllPosts()
+            blogs: await blogPostService.findAllPosts(),
+            archive: await blogPostService.createArchive()
         });
     }
 
     async getPost(req, res) {
         const { idOrSlug } = req.params;
-        const post = (isNaN(+idOrSlug)) ? await postDAO.getPostBySlug(idOrSlug) : await postDAO.getPostById(idOrSlug);
+        const post = (isNaN(+idOrSlug)) ? await blogPostService.findPostBySlug(idOrSlug) : await blogPostService.findPostById(idOrSlug);
 
         res.render('read-post-view', {
             layout: 'blog',
             title: post.title,
-            post
+            post,
+            archive: await blogPostService.createArchive()
         })
     }
 
@@ -45,7 +47,7 @@ module.exports = class BlogController {
         if (validateForm) res.redirect(`/newPost?error=${validateForm[0]}&titleVal=${validateForm[1]}&slugVal=${validateForm[2]}&contentVal=${validateForm[3]}`);
         else {
             const newPost = new NewPost(title, slug, author, content);
-            await postDAO.createPost(newPost);
+            await blogPostService.createPost(newPost);
             res.redirect('/postList')  
         }
     }
@@ -54,8 +56,8 @@ module.exports = class BlogController {
         const {title, slug, content} = req.body;
         const author = authenticator.findUserBySession(req.cookies.ssid).username;
         const newPost = new NewPost(title, slug, author, content);
-        await postDAO.createDraft(newPost);
-        res.redirect('/postList'); 
+        await blogPostService.createDraft(newPost);
+        res.redirect('/adminPostList'); 
     }
 }
 

@@ -113,7 +113,7 @@
 
         const id = document.getElementById('hidden-id').value;
         
-        fetch(`${url}/saveAsDraft/:${id}`, {
+        fetch(`${url}/updatePost/${id}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

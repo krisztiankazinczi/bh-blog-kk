@@ -1,5 +1,5 @@
 <div class="bg-secondary">
-    <div class="container vh-100">
+    <div class="container">
         <a href="http://localhost:3000/newPost"><input class="btn btn-info text-white my-3" value="New Post"></a>
         
         <div class="table-responsive">
@@ -25,13 +25,13 @@
                 <div class="row">
                     <tr>
                         <div class="col-3">
-                            <td class="align-middle text-center">{{this.title}}</td>
+                            <td class="align-middle text-center">{{#if this.draft}}<b>Draft</b>:{{/if}} {{this.title}}</td>
                         </div>
                         <div class="col-3">
                             <td class="align-middle text-center">{{this.author}}</td>
                         </div>
                         <div class="col-3">
-                            <td class="align-middle text-center">{{this.created_at}}</td>
+                            <td class="align-middle text-center">{{#if this.published_at}}{{this.last_modified_at}}{{/if}} {{#unless this.published_at}}N/A{{/unless}}</td>
                         </div>
                         <div class="col-3">
                             <td class="align-middle text-center"><a

@@ -1,16 +1,16 @@
-<div class="container bg-secondary text-white vh-100">
+<div class="container bg-secondary text-white">
     <div class="row">
         <div class="col-12">
             <h3 class="pt-2">Archive</h3><br>
-            <p class="bg-dark">2020</p><br>
-            <p>&nbsp;&nbsp;&nbsp;&nbsp;March</p><br>
-            <p>&nbsp;&nbsp;&nbsp;&nbsp;February</p><br>
-            <p>&nbsp;&nbsp;&nbsp;&nbsp;January</p><br>
-            <p class="bg-dark">2019</p><br>
-            <p>&nbsp;&nbsp;&nbsp;&nbsp;December</p><br>
-            <p>&nbsp;&nbsp;&nbsp;&nbsp;November</p><br>
-            <p>&nbsp;&nbsp;&nbsp;&nbsp;October</p><br>
-            <p>&nbsp;&nbsp;&nbsp;&nbsp;September</p><br>
+            {{#each archive}}
+                <p class="bg-dark m-0 p-0">{{@key}}</p><br>
+                {{#each this }}
+                    <p class="m-0 p-0">&nbsp;&nbsp;&nbsp;&nbsp;{{@key}}</p><br>
+                        {{#each this}}
+                            <p class="m-0 p-0">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="text-white" href="http://localhost:3000/post/{{this.id}}">{{this.title}}</a></p><br>
+                        {{/each}}
+                {{/each}}
+            {{/each}}
         </div>
 
     </div>
