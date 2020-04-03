@@ -1,10 +1,6 @@
 const express = require('express');
 const exphbs = require('express-handlebars');
 
-const DB = require('./repository/db-wrapper');
-const mongoDB = require('./repository/mongo-wrapper')
-const PostRepository = require('./repository/posts_repository')
-const PostRepositoryMongo = require('./repository/posts-repository-mongo')
 const BlogPostService = require('./service/blog-post-service')
 const BlogController = require('./controller/blog-controller')
 
@@ -30,34 +26,28 @@ app.use(express.static('public'))
 const dotenv = require('dotenv')
 dotenv.config({ path: './config.env' })
 
-const fs = require('fs')
-// let configFile = fs.readFileSync('./config.env').toString()
-// if (configFile.includes('TEST=1')) configFile.replace('TEST=1', 'TEST=0')
-// if (configFile.includes('TEST=0')) configFile.replace('TEST=0', 'TEST=1')
-// console.log(configFile.includes('TEST=1'))
-// console.log(configFile.replace('TEST=1', 'TEST=0'))
-// console.log(typeof configFile)
+const selectedDb = process.env.SELECTED_DB
 
-async function setDB() {
-    let configFile = fs.readFileSync('./config.env').toString()
-    if (configFile.includes('TEST=1')) configFile = configFile.replace('TEST=1', 'TEST=0')
-    else configFile = configFile.replace('TEST=0', 'TEST=1')
-    console.log(configFile)
-    fs.writeFileSync('./config.env', configFile, err => {
-        if (err) {
-            console.error(err)
-            return
-        }
-    })
+let adminController, blogController;
+
+if (+selectedDb === 1) {
+    const mongoDB = require('./repository/mongo-wrapper')
+    const PostRepositoryMongo = require('./repository/posts-repository-mongo')
+    adminController = new AdminController(new BlogPostService(new PostRepositoryMongo(new mongoDB())));
+    blogController = new BlogController(new BlogPostService(new PostRepositoryMongo(new mongoDB())));
+} else if (+selectedDb === 0) {
+    const DB = require('./repository/db-wrapper');
+    const PostRepository = require('./repository/posts_repository')
+    blogController = new BlogController( new BlogPostService( new PostRepository( new DB() ) ) );
+    adminController = new AdminController( new BlogPostService( new PostRepository( new DB() ) ) );
+} else {
+    console.log('there must be a mistake in the config file, because we have no db like this')
 }
 
-// setDB()
+
 
 const loginController = new LoginController();
-    const adminController = new AdminController( new BlogPostService( new PostRepository( new DB() ) ) );
-    // const adminController = new AdminController(new BlogPostService(new PostRepositoryMongo(new mongoDB())));
-    const blogController = new BlogController( new BlogPostService( new PostRepository( new DB() ) ) );
-    // const blogController = new BlogController(new BlogPostService(new PostRepositoryMongo(new mongoDB())));
+    
 
     app.get('/postList', blogController.get.bind(blogController));
     app.get('/post/:idOrSlug', blogController.getPost.bind(blogController));
@@ -72,6 +62,9 @@ const loginController = new LoginController();
     app.get('/adminPostList', authMiddleware, adminController.getPosts.bind(adminController));
     app.get('/editPost/:id', authMiddleware, adminController.getPost.bind(adminController));
     app.post('/updatePost/:id', authMiddleware, adminController.updatePost.bind(adminController));
+    app.get('/setDatabase', authMiddleware, adminController.getDBSettings)
+    app.post('/selectDatabase', authMiddleware, adminController.setDB)
+    app.post('/configureMongoDB', authMiddleware, adminController.configureMongoDB)
 
     app.get('/logout', authMiddleware, loginController.logout)
 

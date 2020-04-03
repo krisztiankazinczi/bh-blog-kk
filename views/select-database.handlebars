@@ -1,0 +1,67 @@
+<div class="col-12 bg-secondary">
+    <div class="d-flex justify-content-center align-items-center vh-100">
+        <div class="container bg-secondary">
+
+
+            <form action="/selectDatabase" method="POST">
+                <select name="db" id="db">
+                    <option value="0">Sqlite3</option>
+                    <option value="1">Mongodb</option>
+                </select>
+                <input type="submit" class="btn btn-info">
+            </form>
+            <h3 class="text-success">{{#if success1}}{{success1}}{{/if}}</h3>
+            <h3 class="text-danger">{{#if error1}}{{error1}}{{/if}}</h3>
+
+
+            <div class="row mt-5">
+                <div class="col-1 text-right"></div>
+                <div class="col-9">
+                    <h1 class="text-light">Please define the connection options of the MongoDB server if it needs to be
+                        changed</h1>
+                </div>
+                <div class="col2"></div>
+            </div>
+            <form action="/configureMongoDB" method="POST">
+                <div class="row mt-5">
+                    <div class="col-3 text-right text-light">
+                        <label for="url"><b>Connection URL</b></label>
+                    </div>
+                    <div class="col-7">
+                        <input type="text" class="w-75" id="url" name="url">
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-3 text-right text-light">
+                        <label for="username"><b>Username</b></label>
+                    </div>
+                    <div class="col-7">
+                        <input type="text" class="w-75" id="username" name="username">
+                    </div>
+                </div>
+
+
+                <div class="row mt-4">
+                    <div class="col-3 text-right text-light">
+                        <label for="password"><b>Password</b></label>
+                    </div>
+                    <div class="col-7">
+                        <input type="password" class="w-75" name="password" id="password">
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-3 text-right text-light">
+                    </div>
+                    <div class="col-7">
+                        <input type="submit" class="btn btn-danger w-75" value="Change the configuration">
+                    </div>
+                </div>
+                <h3 class="text-success">{{#if success2}}{{success2}}{{/if}}</h3>
+                <h3 class="text-danger">{{#if error2}}{{error2}}{{/if}}</h3>
+
+
+        </div>
+    </div>
+</div>
