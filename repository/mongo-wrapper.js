@@ -2,16 +2,15 @@ const dotenv = require('dotenv')
 dotenv.config({ path: './config.env' })
 
 const mongoose = require('mongoose')
-mongoose.set('useFindAndModify', false);
 
 console.log(process.env.DATABASE)
 
- const DB = process.env.DATABASE.replace('<PASSWORD>', process.env.DATABASE_PASSWORD)
+const DB = process.env.DATABASE.replace('<PASSWORD>', process.env.DATABASE_PASSWORD)
 
 mongoose.connect(DB, {
     useNewUrlParser: true,
     useCreateIndex: true,
-    useFindAndModify: true,
+    useFindAndModify: false,
     useUnifiedTopology: true
 })
     .then(con => console.log('db connection successfull'))
@@ -67,7 +66,7 @@ module.exports = class DB_Mongo {
             draft: newPost.draft
         })
         return new Promise((resolve, reject) => {
-            createPost.save( (err, doc) => {
+            createPost.save((err, doc) => {
                 if (err) {
                     reject(err);
                     return
@@ -77,28 +76,54 @@ module.exports = class DB_Mongo {
         })
     }
 
-    findOne(filter) {
-        return new Promise((resolve, reject) => {
-            Post.find(filter, (err, doc) => {
-                if (err) {
-                    reject(err);
-                    return
-                }
-                resolve(doc)
+    // findOne(filter) {
+    //     return new Promise((resolve, reject) => {
+    //         Post.find(filter, (err, doc) => {
+    //             if (err) {
+    //                 reject(err);
+    //                 return
+    //             }
+    //             console.log(doc)
+    //             resolve(doc)
+    //         })
+    //     })
+    // }
+
+    async findOneAndUpdate(filter, update) {
+
+        try {
+            const result = await this.findBy(filter)
+            // console.log(result.published_at)
+
+            const updatePost = {
+                _id: update.id,
+                title: update.title,
+                slug: update.slug,
+                author: update.author,
+                last_modified_at: update.last_modified_at,
+                content: update.content,
+                draft: update.draft
+            }
+            if (result.published_at) updatePost.published_at = result.published_at
+            else if (!result.published_at && updatePost.draft === false) updatePost.published_at = new Date();
+            else updatePost.published_at = result.published_at
+            // console.log(updatePost.published_at)
+            return new Promise((resolve, reject) => {
+                Post.findOneAndUpdate(filter, updatePost, { new: true, runValidators: true }, (err, doc) => {
+                    if (err) {
+                        reject(err);
+                        return
+                    }
+                    // console.log(doc)
+                    resolve(doc)
+                })
             })
-        })
+        } catch(error) {
+        console.log(error)
     }
 
-    findOneAndUpdate(filter, update) {
-        return new Promise((resolve, reject) => {
-            Post.find(filter, update, (err, doc) => {
-                if (err) {
-                    reject(err);
-                    return
-                }
-                resolve(doc)
-            })
-        })
     }
+
 
 }
+

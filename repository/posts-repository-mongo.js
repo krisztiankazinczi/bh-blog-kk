@@ -18,6 +18,17 @@ module.exports = class PostRepository {
         }
     }
 
+    async findSearchedFor(searchFor) {
+        const filter = { "content": { "$regex": searchFor, "$options": "i" } }
+        try {
+            let allPosts = await this.db.findBy(filter);
+            allPosts = allPosts.map(post => new NewPost(post.id, post.title, post.slug, post.author, post.last_modified_at, post.published_at, post.content, post.draft))
+            return allPosts;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
     async findPostBySlug(slug) {
         const filter = {slug}
         try {
@@ -30,7 +41,6 @@ module.exports = class PostRepository {
     }
 
     async findPostById(id) {
-        console.log(id)
         const filter = { _id: id }
         try {
             let post = await this.db.findBy(filter);
@@ -58,6 +68,23 @@ module.exports = class PostRepository {
     }
 
 
+    async updatePost(updatedPost, id) {
+        const filter = {_id : id}
+        try {
+            await this.db.findOneAndUpdate(filter, updatedPost)
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    async updatePostAsDraft(updatedPost, id) {
+        const filter = {_id : id}
+        try {
+            await this.db.findOneAndUpdate(filter, updatedPost)
+        } catch (error) {
+            console.error(error);
+        }
+    }
 
 
 

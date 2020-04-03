@@ -36,9 +36,10 @@ module.exports = class AdminController {
         const { title, slug, content, draft } = req.body;
         const author = authenticator.findUserBySession(req.cookies.ssid).username;
 
-        const updatedPost = new NewPost(title, slug, author, content);
-        
-        (draft) ? await this.blogPostService.updatePostAsDraft(updatedPost, id) : await this.blogPostService.updatePost(updatedPost, id);
+        const updatedPost = (draft) ? new NewPost(id, title, slug, author, new Date().toLocaleString().split(',')[0], null, content, true) : new NewPost(id, title, slug, author, new Date().toLocaleString().split(',')[0], new Date(), content, false)
+        // (draft) ? await this.blogPostService.updatePostAsDraft(updatedPost, id) : await this.blogPostService.updatePost(updatedPost, id);
+        if (draft) await this.blogPostService.updatePostAsDraft(updatedPost, id)
+        else await this.blogPostService.updatePost(updatedPost, id)
         res.redirect('/adminPostList')   
     }
 }

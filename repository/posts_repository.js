@@ -1,6 +1,6 @@
 const DB = require('./db-wrapper');
 
-// const db = new DB();
+const NewPost = require('../utils/NewPost')
 
 module.exports = class PostRepository {
     constructor(db) {
@@ -9,8 +9,8 @@ module.exports = class PostRepository {
     async findAllPosts() {
         const sqlGetAllPosts = 'SELECT id, title, slug, author, last_modified_at, published_at, content, draft FROM posts ORDER BY published_at DESC'
         try {
-            const allPosts = await this.db.all(sqlGetAllPosts);
-            //newPost creations
+            let allPosts = await this.db.all(sqlGetAllPosts);
+            allPosts = allPosts.map(post => new NewPost(post.id, post.title, post.slug, post.author, post.last_modified_at, post.published_at, post.content, post.draft))
             return allPosts;
         } catch (error) {
             console.error(error);
@@ -21,8 +21,9 @@ module.exports = class PostRepository {
         searchFor = `%${searchFor}%`;
         const sqlGetAllFilteredPosts = `SELECT id, title, slug, author, last_modified_at, published_at, content, draft FROM posts WHERE content LIKE ? OR title LIKE ?`
         try {
-            const post = await this.db.all(sqlGetAllFilteredPosts, [searchFor, searchFor]);
-            return post;
+            let allPosts = await this.db.all(sqlGetAllFilteredPosts, [searchFor, searchFor]);
+            allPosts = allPosts.map(post => new NewPost(post.id, post.title, post.slug, post.author, post.last_modified_at, post.published_at, post.content, post.draft))
+            return allPosts;
         } catch (error) {
             console.error(error);
         }
@@ -31,7 +32,8 @@ module.exports = class PostRepository {
     async findPostById(id) {
         const sqlGetPostById = 'SELECT id, title, slug, author, last_modified_at, published_at, content, draft FROM posts WHERE id = ?'
         try {
-            const post = await this.db.get(sqlGetPostById, [id]);
+            let post = await this.db.get(sqlGetPostById, [id]);
+            post = new NewPost(post.id, post.title, post.slug, post.author, post.last_modified_at, post.published_at, post.content, post.draft)
             return post;
         } catch (error) {
             console.error(error);
@@ -41,7 +43,8 @@ module.exports = class PostRepository {
     async findPostBySlug(slug) {
         const sqlGetPostBySlug = 'SELECT id, title, slug, author, last_modified_at, published_at, content, draft FROM posts WHERE slug = ?'
         try {
-            const post = await this.db.get(sqlGetPostBySlug, [slug]);
+            let post = await this.db.get(sqlGetPostBySlug, [slug]); 
+            post = new NewPost(post.id, post.title, post.slug, post.author, post.last_modified_at, post.published_at, post.content, post.draft)
             return post;
         } catch (error) {
             console.error(error);
