@@ -53,11 +53,6 @@ class BlogPostService {
                 const year = date.getFullYear();
                 const month = months[date.getMonth()];
     
-                if (index === 0) {
-                    archive[year] = {}
-                    archive[year][month] = [{id: row.id, title: row.title}]
-                    return;
-                } 
                 archive[year] = archive[year] || {}
     
                 if (!archive[year][month]) {

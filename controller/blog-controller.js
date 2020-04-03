@@ -11,7 +11,6 @@ module.exports = class BlogController {
 
     async get(req, res) {
         const { searchFor } = req.query;
-
         const blogs = (searchFor) ? await this.blogPostService.findSearchedFor(searchFor) : await this.blogPostService.findAllPosts()
         res.render('post-list', {
             layout: 'blog',
@@ -23,8 +22,7 @@ module.exports = class BlogController {
 
     async getPost(req, res) {
         const { idOrSlug } = req.params;
-        const post = (isNaN(+idOrSlug)) ? await this.blogPostService.findPostBySlug(idOrSlug) : await this.blogPostService.findPostById(idOrSlug);
-
+        const post = (idOrSlug.includes('-')) ? await this.blogPostService.findPostBySlug(idOrSlug) : await this.blogPostService.findPostById(idOrSlug);
         res.render('read-post-view', {
             layout: 'blog',
             title: post.title,
@@ -51,7 +49,8 @@ module.exports = class BlogController {
         
         if (validateForm) res.redirect(`/newPost?error=${validateForm[0]}&titleVal=${validateForm[1]}&slugVal=${validateForm[2]}&contentVal=${validateForm[3]}`);
         else {
-            const newPost = new NewPost(title, slug, author, content);
+            // const newPost = new NewPost(title, slug, author, content);
+            const newPost = new NewPost(undefined, title, slug, author, new Date().toLocaleString().split(',')[0], new Date(), content, false)
             await this.blogPostService.createPost(newPost);
             res.redirect('/postList')  
         }
@@ -60,7 +59,8 @@ module.exports = class BlogController {
     async draft(req, res) {
         const {title, slug, content} = req.body;
         const author = authenticator.findUserBySession(req.cookies.ssid).username;
-        const newPost = new NewPost(title, slug, author, content);
+        // const newPost = new NewPost(title, slug, author, content);
+        const newPost = new NewPost(undefined, title, slug, author, new Date().toLocaleString().split(',')[0], null, content, true)
         await this.blogPostService.createDraft(newPost);
         res.redirect('/adminPostList'); 
     }
