@@ -8,7 +8,6 @@ module.exports = class Themes {
 
     findThemes() {
         const themesPath = path.join(__dirname, '../public/themes/')
-        console.log(themesPath)
         return new Promise((resolve, reject) => {
             fs.readdir(themesPath, (err, themes) => {
                 if (err) {
@@ -28,15 +27,19 @@ module.exports = class Themes {
         fs.writeFileSync('./config.env', configFile, err => {
             if (err) {
                 console.log(err)
-                return false
             }
-            return true
         })
 
     }
 
     loadTheme() {
         return process.env.SELECTED_THEME
+    }
+
+    createThemePath(selectedTheme) {
+        if (!selectedTheme) selectedTheme = process.env.SELECTED_THEME
+        const themePath = `/themes/${selectedTheme}/bootstrap.css`
+        return themePath;
     }
 
 }

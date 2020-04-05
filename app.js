@@ -55,18 +55,18 @@ const loginController = new LoginController();
     app.post('/newPost', authMiddleware, blogController.post.bind(blogController));
     app.post('/draft', authMiddleware, blogController.draft.bind(blogController));
 
-    app.get('/login', loginController.get);
+    app.get('/login', loginController.get.bind(loginController));
     app.post('/login', loginController.post).bind(loginController);
 
-    app.get('/admin', authMiddleware, adminController.getDashboard);
+    app.get('/admin', authMiddleware, adminController.getDashboard.bind(adminController));
     app.get('/adminPostList', authMiddleware, adminController.getPosts.bind(adminController));
     app.get('/editPost/:id', authMiddleware, adminController.getPost.bind(adminController));
     app.post('/updatePost/:id', authMiddleware, adminController.updatePost.bind(adminController));
-    app.get('/setDatabase', authMiddleware, adminController.getDBSettings)
+    app.get('/setDatabase', authMiddleware, adminController.getDBSettings.bind(adminController))
     app.post('/selectDatabase', authMiddleware, adminController.setDB)
     app.post('/configureMongoDB', authMiddleware, adminController.configureMongoDB)
-    app.get('/selectTheme', authMiddleware, adminController.findThemes)
-    app.post('/selectTheme', authMiddleware, adminController.setTheme)
+    app.get('/selectTheme', authMiddleware, adminController.findThemes.bind(adminController))
+    app.post('/selectTheme', authMiddleware, adminController.setTheme.bind(adminController))
 
     app.get('/logout', authMiddleware, loginController.logout)
 

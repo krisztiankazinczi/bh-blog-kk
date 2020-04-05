@@ -10,11 +10,15 @@ const fs = require('fs')
 module.exports = class AdminController {
     constructor(blogPostService) {
         this.blogPostService = blogPostService
-        this.css = this.createThemePath()
+        this.theme = themes.createThemePath()
+    }
+
+    getTheme() {
+        return this.theme
     }
 
     getDashboard(req, res) {
-        res.render('admin', { layout: 'main' })
+        res.render('admin', { layout: 'main', css: this.getTheme() })
     }
 
     async getPosts(req, res) {
@@ -24,7 +28,7 @@ module.exports = class AdminController {
             title: 'Blog Title',
             posts: await this.blogPostService.findAllPosts(),
             archive: await this.blogPostService.createArchive(),
-            css: this.css
+            css: this.theme
         });
     }
 
@@ -35,7 +39,8 @@ module.exports = class AdminController {
             layout: 'blog',
             title: post.title,
             post,
-            archive: await this.blogPostService.createArchive()
+            archive: await this.blogPostService.createArchive(),
+            css: this.theme
         })
     }
 
@@ -53,11 +58,18 @@ module.exports = class AdminController {
     getDBSettings(req, res) {
         let { success, error } = req.query
         let success1, success2, error1, error2;
-        if (success == 1)  success1 = 'Please restart the server to start to use the selected database'
-        if (error == 1)  error1 = 'We are sorry, but we can not change the database'
-        if (success == 2)  success2 = 'The configuration of MongoDB Connection successfully has been changed'
-        if (error == 2)  error2 = 'Weare sorry, but the provided details were not correct'
-        res.render('select-database', { layout: 'main', success1, error1, success2, error2 })
+        if (success == 1) success1 = 'Please restart the server to start to use the selected database'
+        if (error == 1) error1 = 'We are sorry, but we can not change the database'
+        if (success == 2) success2 = 'The configuration of MongoDB Connection successfully has been changed'
+        if (error == 2) error2 = 'Weare sorry, but the provided details were not correct'
+        res.render('select-database', { 
+            layout: 'main', 
+            success1, 
+            error1, 
+            success2, 
+            error2, 
+            css: this.theme 
+        })
     }
 
     setDB(req, res) {
@@ -71,7 +83,7 @@ module.exports = class AdminController {
                 res.redirect('/setDatabase?error=1')
                 return
             }
-            
+
         })
         res.redirect('/setDatabase?success=1')
 
@@ -89,7 +101,7 @@ module.exports = class AdminController {
                 res.redirect('/setDatabase?error=2')
                 return
             }
-            
+
         })
         res.redirect('/setDatabase?success=2')
     }
@@ -102,25 +114,22 @@ module.exports = class AdminController {
         } catch (error) {
             console.log(error)
         }
-        res.render('select-theme', { layout: 'main', themeList, error})
+        res.render('select-theme', { layout: 'main', themeList, error, css: this.theme })
     }
 
     setTheme(req, res) {
-        const {selectedTheme} = req.body;
-        console.log(selectedTheme)
-        const result = themes.setTheme(selectedTheme)
-        this.css = this.createThemePath()
-        res.redirect('/admin')
+        const { selectedTheme } = req.body;
+        try {
+            themes.setTheme(selectedTheme)
+            this.theme = themes.createThemePath(selectedTheme)
+            res.redirect('/admin')
+        } catch (error) {
+            console.log(error)
+            res.redirect('/admin?error=true')
+        }
         // if (result === true) res.redirect('/selectTheme?success=true')
         // else res.redirect('/selectTheme?error=true')
     }
-
-    createThemePath() {
-        const selectedTheme = themes.loadTheme()
-        const themePath = `/themes/${selectedTheme}/bootstrap.css`
-        return themePath;
-    }
-
 
 }
 
