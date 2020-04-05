@@ -1,4 +1,3 @@
-const BlogPostService = require('../service/blog-post-service')
 const NewPost = require('../utils/NewPost');
 const authenticator = require('../service/authenticator');
 const {validateNewPost} = require('./validation/new-post-validation');
@@ -16,6 +15,7 @@ module.exports = class BlogController {
             layout: 'blog',
             title: 'Blog Title',
             blogs: blogs,
+            css: "/themes/minty/bootstrap.css",
             archive: await this.blogPostService.createArchive()
         });
     }
@@ -49,7 +49,6 @@ module.exports = class BlogController {
         
         if (validateForm) res.redirect(`/newPost?error=${validateForm[0]}&titleVal=${validateForm[1]}&slugVal=${validateForm[2]}&contentVal=${validateForm[3]}`);
         else {
-            // const newPost = new NewPost(title, slug, author, content);
             const newPost = new NewPost(undefined, title, slug, author, new Date().toLocaleString().split(',')[0], new Date(), content, false)
             await this.blogPostService.createPost(newPost);
             res.redirect('/postList')  
@@ -59,7 +58,6 @@ module.exports = class BlogController {
     async draft(req, res) {
         const {title, slug, content} = req.body;
         const author = authenticator.findUserBySession(req.cookies.ssid).username;
-        // const newPost = new NewPost(title, slug, author, content);
         const newPost = new NewPost(undefined, title, slug, author, new Date().toLocaleString().split(',')[0], null, content, true)
         await this.blogPostService.createDraft(newPost);
         res.redirect('/adminPostList'); 

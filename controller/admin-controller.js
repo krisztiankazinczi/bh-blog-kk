@@ -1,5 +1,7 @@
 const authenticator = require('../service/authenticator');
 const NewPost = require('../utils/NewPost');
+const Themes = require('../service/themes')
+const themes = new Themes()
 
 const dotenv = require('dotenv')
 dotenv.config({ path: './config.env' })
@@ -8,6 +10,7 @@ const fs = require('fs')
 module.exports = class AdminController {
     constructor(blogPostService) {
         this.blogPostService = blogPostService
+        this.css = this.createThemePath()
     }
 
     getDashboard(req, res) {
@@ -15,11 +18,13 @@ module.exports = class AdminController {
     }
 
     async getPosts(req, res) {
+
         res.render('admin-post-list', {
             layout: 'blog',
             title: 'Blog Title',
             posts: await this.blogPostService.findAllPosts(),
-            archive: await this.blogPostService.createArchive()
+            archive: await this.blogPostService.createArchive(),
+            css: this.css
         });
     }
 
@@ -40,7 +45,6 @@ module.exports = class AdminController {
         const author = authenticator.findUserBySession(req.cookies.ssid).username;
 
         const updatedPost = (draft) ? new NewPost(id, title, slug, author, new Date().toLocaleString().split(',')[0], null, content, true) : new NewPost(id, title, slug, author, new Date().toLocaleString().split(',')[0], new Date(), content, false)
-        // (draft) ? await this.blogPostService.updatePostAsDraft(updatedPost, id) : await this.blogPostService.updatePost(updatedPost, id);
         if (draft) await this.blogPostService.updatePostAsDraft(updatedPost, id)
         else await this.blogPostService.updatePost(updatedPost, id)
         res.redirect('/adminPostList')
@@ -75,7 +79,6 @@ module.exports = class AdminController {
 
     configureMongoDB(req, res) {
         const { url, username, password } = req.body;
-        console.log(username, password)
         let configFile = fs.readFileSync('./config.env').toString()
         configFile = configFile.replace(`DATABASE=${process.env.DATABASE}`, `DATABASE=${url}`)
         configFile = configFile.replace(`DATABASE_USERNAME=${process.env.DATABASE_USERNAME}`, `DATABASE=${username}`)
@@ -89,6 +92,33 @@ module.exports = class AdminController {
             
         })
         res.redirect('/setDatabase?success=2')
+    }
+
+    async findThemes(req, res) {
+        const { error } = req.query
+        let themeList;
+        try {
+            themeList = await themes.findThemes()
+        } catch (error) {
+            console.log(error)
+        }
+        res.render('select-theme', { layout: 'main', themeList, error})
+    }
+
+    setTheme(req, res) {
+        const {selectedTheme} = req.body;
+        console.log(selectedTheme)
+        const result = themes.setTheme(selectedTheme)
+        this.css = this.createThemePath()
+        res.redirect('/admin')
+        // if (result === true) res.redirect('/selectTheme?success=true')
+        // else res.redirect('/selectTheme?error=true')
+    }
+
+    createThemePath() {
+        const selectedTheme = themes.loadTheme()
+        const themePath = `/themes/${selectedTheme}/bootstrap.css`
+        return themePath;
     }
 
 

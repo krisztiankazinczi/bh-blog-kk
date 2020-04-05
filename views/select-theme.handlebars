@@ -1,0 +1,18 @@
+<div class="col-12 bg-secondary">
+    <div class="d-flex justify-content-center align-items-center vh-100">
+        <div class="container bg-secondary">
+
+
+            <form action="/selectTheme" method="POST">
+                <select name="selectedTheme">
+                    {{#each themeList}}
+                        <option value={{this}}>{{this}}</option>
+                    {{/each}}  
+                </select>
+                <input type="submit" class="btn btn-info">
+            </form>
+            {{#if error}}<h4 class="text-danger">We are really sorry, but something went wront, please try it again!</h4>{{/if}}
+            {{#if success}}<h4 class="text-success">The theme have been changed successfully!</h4>{{/if}}
+        </div>
+    </div>
+</div>
