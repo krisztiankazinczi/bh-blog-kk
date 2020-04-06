@@ -30,6 +30,7 @@
     "mongoose": "^5.9.7",
     "path": "^0.12.7",
     "popper.js": "^1.16.1",
+    "slugify": "^1.4.0",
     "sqlite3": "^4.1.1",
     "uid-safe": "^2.1.5"
   }

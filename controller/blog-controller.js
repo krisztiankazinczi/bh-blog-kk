@@ -1,6 +1,8 @@
 const NewPost = require('../utils/NewPost');
 const authenticator = require('../service/authenticator');
-const {validateNewPost} = require('./validation/new-post-validation');
+const { validateNewPost } = require('./validation/new-post-validation');
+
+const slugify = require('slugify')
 
 module.exports = class BlogController {
     constructor(blogPostService, themeService) {
@@ -44,25 +46,28 @@ module.exports = class BlogController {
 
 
     async post(req, res) {
-        const {title, content, slug} = req.body;
+        const { title, content } = req.body;
+        let  { slug } = req.body;
         const author = authenticator.findUserBySession(req.cookies.ssid).username;
 
         const validateForm = validateNewPost(title, slug, content)
-        
+
         if (validateForm) res.redirect(`/newPost?error=${validateForm[0]}&titleVal=${validateForm[1]}&slugVal=${validateForm[2]}&contentVal=${validateForm[3]}`);
         else {
+            const correctSlug = checkSlugCorrectness(slug)
+            if (!correctSlug) slug = slugify(title)
             const newPost = new NewPost(undefined, title, slug, author, new Date().toLocaleString().split(',')[0], new Date(), content, false)
             await this.blogPostService.createPost(newPost);
-            res.redirect('/postList')  
+            res.redirect('/postList')
         }
     }
 
     async draft(req, res) {
-        const {title, slug, content} = req.body;
+        const { title, slug, content } = req.body;
         const author = authenticator.findUserBySession(req.cookies.ssid).username;
         const newPost = new NewPost(undefined, title, slug, author, new Date().toLocaleString().split(',')[0], null, content, true)
         await this.blogPostService.createDraft(newPost);
-        res.redirect('/adminPostList'); 
+        res.redirect('/adminPostList');
     }
 }
 
@@ -97,4 +102,10 @@ function createErrorObjectForAddPost(query) {
         errorAndValue.contentValue = query.contentVal;
     }
     return errorAndValue;
+}
+
+function checkSlugCorrectness(slug) {
+    const regexp = /^[a-zA-Z0-9-]+$/;
+    if (slug.search(regexp) === -1) return false
+    else return true
 }
