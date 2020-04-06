@@ -7,6 +7,8 @@ const BlogController = require('./controller/blog-controller')
 const LoginController = require('./controller/login-controller')
 const AdminController = require('./controller/admin-controller')
 
+const ThemeService = require('./service/theme-service')
+
 const authMiddleware = require('./middlewares/authMiddleware')
 
 const app = express();
@@ -33,20 +35,20 @@ let adminController, blogController;
 if (+selectedDb === 1) {
     const mongoDB = require('./repository/mongo-wrapper')
     const PostRepositoryMongo = require('./repository/posts-repository-mongo')
-    adminController = new AdminController(new BlogPostService(new PostRepositoryMongo(new mongoDB())));
-    blogController = new BlogController(new BlogPostService(new PostRepositoryMongo(new mongoDB())));
+    adminController = new AdminController(new BlogPostService(new PostRepositoryMongo(new mongoDB())), new ThemeService());
+    blogController = new BlogController(new BlogPostService(new PostRepositoryMongo(new mongoDB())), new ThemeService());
 } else if (+selectedDb === 0) {
     const DB = require('./repository/db-wrapper');
     const PostRepository = require('./repository/posts_repository')
-    blogController = new BlogController( new BlogPostService( new PostRepository( new DB() ) ) );
-    adminController = new AdminController( new BlogPostService( new PostRepository( new DB() ) ) );
+    blogController = new BlogController( new BlogPostService( new PostRepository( new DB() ) ), new ThemeService() );
+    adminController = new AdminController( new BlogPostService( new PostRepository( new DB() ) ), new ThemeService() );
 } else {
     console.log('there must be a mistake in the config file, because we have no db like this')
 }
 
 
 
-const loginController = new LoginController();
+const loginController = new LoginController( new ThemeService() );
     
 
     app.get('/postList', blogController.get.bind(blogController));

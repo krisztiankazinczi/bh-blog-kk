@@ -29,6 +29,11 @@ module.exports = class ThemeService {
                 console.log(err)
             }
         })
+        // reload the config file values
+        const envConfig = dotenv.parse(fs.readFileSync('./config.env'))
+        for (const k in envConfig) {
+            process.env[k] = envConfig[k]
+        }
 
     }
 
@@ -37,13 +42,13 @@ module.exports = class ThemeService {
     }
 
     createThemePath(selectedTheme) {
-        if (!selectedTheme) selectedTheme = process.env.SELECTED_THEME
+        if (!selectedTheme) selectedTheme = this.loadTheme()
         const themePath = `/themes/${selectedTheme}/bootstrap.css`
         return themePath;
     }
 
 
-    
+
 
 }
 

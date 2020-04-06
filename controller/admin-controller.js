@@ -1,7 +1,5 @@
 const authenticator = require('../service/authenticator');
 const NewPost = require('../utils/NewPost');
-const ThemeService = require('../service/theme-service')
-const themeService = new ThemeService()
 
 //for file upload, unzipping
 const formidable = require('formidable');
@@ -14,9 +12,10 @@ dotenv.config({ path: './config.env' })
 const fs = require('fs')
 
 module.exports = class AdminController {
-    constructor(blogPostService) {
+    constructor(blogPostService, themeService) {
         this.blogPostService = blogPostService
-        this.theme = themeService.createThemePath()
+        this.themeService = themeService
+        this.theme = this.themeService.createThemePath()
     }
 
     getTheme() {
@@ -119,7 +118,7 @@ module.exports = class AdminController {
         if (success === 'install') installSuccess = 'The selected theme was successfully installed'
         let themeList;
         try {
-            themeList = await themeService.findThemes()
+            themeList = await this.themeService.findThemes()
         } catch (error) {
             console.log(error)
         }
@@ -135,8 +134,8 @@ module.exports = class AdminController {
     setTheme(req, res) {
         const { selectedTheme } = req.body;
         try {
-            themeService.setTheme(selectedTheme)
-            this.theme = themeService.createThemePath(selectedTheme)
+            this.themeService.setTheme(selectedTheme)
+            this.theme = this.themeService.createThemePath(selectedTheme)
             res.redirect('/admin')
         } catch (error) {
             console.log(error)

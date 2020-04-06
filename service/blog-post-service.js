@@ -1,4 +1,3 @@
-const PostRepository = require('../repository/posts_repository');
 
 class BlogPostService {
     constructor(postRepository) {

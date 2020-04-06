@@ -2,13 +2,10 @@ const NewPost = require('../utils/NewPost');
 const authenticator = require('../service/authenticator');
 const {validateNewPost} = require('./validation/new-post-validation');
 
-const ThemeService = require('../service/theme-service')
-const themes = new ThemeService()
-
 module.exports = class BlogController {
-    constructor(blogPostService) {
+    constructor(blogPostService, themeService) {
         this.blogPostService = blogPostService;
-        this.theme = themes.createThemePath()
+        this.themeService = themeService
     }
 
     async get(req, res) {
@@ -18,9 +15,8 @@ module.exports = class BlogController {
             layout: 'blog',
             title: 'Blog Title',
             blogs: blogs,
-            css: "/themes/minty/bootstrap.css",
             archive: await this.blogPostService.createArchive(),
-            css: this.theme
+            css: this.themeService.createThemePath()
         });
     }
 
@@ -32,7 +28,7 @@ module.exports = class BlogController {
             title: post.title,
             post,
             archive: await this.blogPostService.createArchive(),
-            css: this.theme
+            css: this.themeService.createThemePath()
         })
     }
 
@@ -42,7 +38,7 @@ module.exports = class BlogController {
         res.render('add-new-post', {
             layout: 'main',
             error,
-            css: this.theme
+            css: this.themeService.createThemePath()
         });
     }
 

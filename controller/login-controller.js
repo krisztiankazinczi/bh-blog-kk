@@ -1,13 +1,10 @@
 const authenticator = require('../service/authenticator');
 
-const ThemeService = require('../service/theme-service')
-const themes = new ThemeService()
-
 const AUTH_COOKIE = 'ssid';
 
 module.exports = class LoginController {
-    constructor() {
-        this.theme = themes.createThemePath()
+    constructor(themeService) {
+        this.themeService = themeService
     }
 
     get(req, res) {
@@ -16,7 +13,7 @@ module.exports = class LoginController {
         if (req.query.error === 'credentials') error = 'Error! Invalid Credentials';
         if (req.query.error === 'loginNeeded') error = 'Please login!';
         if (req.query.logout === 'successful') successLogout = 'Logout Successful';
-        res.render('login', {layout: 'main', error, successLogout, css: this.theme});
+        res.render('login', {layout: 'main', error, successLogout, css: this.themeService.createThemePath()});
     }
 
     post(req, res) {

@@ -1,5 +1,3 @@
-const DB = require('./db-wrapper');
-
 const NewPost = require('../utils/NewPost')
 
 module.exports = class PostRepository {
