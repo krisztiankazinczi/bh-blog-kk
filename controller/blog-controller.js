@@ -2,8 +2,8 @@ const NewPost = require('../utils/NewPost');
 const authenticator = require('../service/authenticator');
 const {validateNewPost} = require('./validation/new-post-validation');
 
-const Themes = require('../service/themes')
-const themes = new Themes()
+const ThemeService = require('../service/theme-service')
+const themes = new ThemeService()
 
 module.exports = class BlogController {
     constructor(blogPostService) {

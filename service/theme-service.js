@@ -4,7 +4,7 @@ const dotenv = require('dotenv')
 dotenv.config({ path: './config.env' })
 
 
-module.exports = class Themes {
+module.exports = class ThemeService {
 
     findThemes() {
         const themesPath = path.join(__dirname, '../public/themes/')

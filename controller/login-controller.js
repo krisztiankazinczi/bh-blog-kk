@@ -1,7 +1,7 @@
 const authenticator = require('../service/authenticator');
 
-const Themes = require('../service/themes')
-const themes = new Themes()
+const ThemeService = require('../service/theme-service')
+const themes = new ThemeService()
 
 const AUTH_COOKIE = 'ssid';
 

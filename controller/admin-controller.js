@@ -1,7 +1,7 @@
 const authenticator = require('../service/authenticator');
 const NewPost = require('../utils/NewPost');
-const Themes = require('../service/themes')
-const themes = new Themes()
+const ThemeService = require('../service/theme-service')
+const themeService = new ThemeService()
 
 const dotenv = require('dotenv')
 dotenv.config({ path: './config.env' })
@@ -10,7 +10,7 @@ const fs = require('fs')
 module.exports = class AdminController {
     constructor(blogPostService) {
         this.blogPostService = blogPostService
-        this.theme = themes.createThemePath()
+        this.theme = themeService.createThemePath()
     }
 
     getTheme() {
@@ -110,7 +110,7 @@ module.exports = class AdminController {
         const { error } = req.query
         let themeList;
         try {
-            themeList = await themes.findThemes()
+            themeList = await themeService.findThemes()
         } catch (error) {
             console.log(error)
         }
@@ -120,8 +120,8 @@ module.exports = class AdminController {
     setTheme(req, res) {
         const { selectedTheme } = req.body;
         try {
-            themes.setTheme(selectedTheme)
-            this.theme = themes.createThemePath(selectedTheme)
+            themeService.setTheme(selectedTheme)
+            this.theme = themeService.createThemePath(selectedTheme)
             res.redirect('/admin')
         } catch (error) {
             console.log(error)
