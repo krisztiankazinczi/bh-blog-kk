@@ -67,6 +67,7 @@ const loginController = new LoginController();
     app.post('/configureMongoDB', authMiddleware, adminController.configureMongoDB)
     app.get('/selectTheme', authMiddleware, adminController.findThemes.bind(adminController))
     app.post('/selectTheme', authMiddleware, adminController.setTheme.bind(adminController))
+    app.post('/installTheme', authMiddleware, adminController.installTheme.bind(adminController))
 
     app.get('/logout', authMiddleware, loginController.logout)
 

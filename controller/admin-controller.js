@@ -3,6 +3,12 @@ const NewPost = require('../utils/NewPost');
 const ThemeService = require('../service/theme-service')
 const themeService = new ThemeService()
 
+//for file upload, unzipping
+const formidable = require('formidable');
+const extract = require('extract-zip')
+const path = require('path')
+
+// for reading and modifiing the config files
 const dotenv = require('dotenv')
 dotenv.config({ path: './config.env' })
 const fs = require('fs')
@@ -107,14 +113,23 @@ module.exports = class AdminController {
     }
 
     async findThemes(req, res) {
-        const { error } = req.query
+        const { error, success } = req.query
+        let installError, installSuccess;
+        if (error === 'invalid-file-type') installError = 'The uploaded file is not zipped file, we deleted the file. Please upload the above mentioned file structure!'
+        if (success === 'install') installSuccess = 'The selected theme was successfully installed'
         let themeList;
         try {
             themeList = await themeService.findThemes()
         } catch (error) {
             console.log(error)
         }
-        res.render('select-theme', { layout: 'main', themeList, error, css: this.theme })
+        res.render('select-theme', { 
+            layout: 'main', 
+            themeList, 
+            error, 
+            installError,
+            installSuccess,
+            css: this.theme })
     }
 
     setTheme(req, res) {
@@ -127,10 +142,55 @@ module.exports = class AdminController {
             console.log(error)
             res.redirect('/admin?error=true')
         }
-        // if (result === true) res.redirect('/selectTheme?success=true')
-        // else res.redirect('/selectTheme?error=true')
     }
 
+
+    installTheme(req, res) {
+        const form = new formidable.IncomingForm();
+    
+        form.parse(req);
+    
+        form.on('fileBegin', function (name, file) {
+            file.path = path.join(__dirname, '../uploaded/', file.name)
+        });
+    
+        form.on('file', function (name, file) {
+            const fileType = file.type.split('/').pop();
+            if (fileType === 'x-zip-compressed') {
+                console.log('Uploaded ' + file.name);
+                const targetPath = path.join(__dirname, '../public/themes/')
+                extractAndDeleteZippedFolder(file.path, targetPath)
+                res.redirect('/selectTheme?success=install');
+            }
+            else {
+                console.log('invalid filetype');
+                fs.unlinkSync(file.path);
+                console.log('Deleted: ' + file.path);
+                res.redirect('/selectTheme?error=invalid-file-type');
+            }
+        });
+    
+        
+    }
+    
+}
+
+
+
+async function extractAndDeleteZippedFolder(zipPath, targetPath) {
+    try {
+        await extract(zipPath, { dir: targetPath })
+        console.log('Extraction complete')
+        await fs.unlink(zipPath, (err) => {
+            if (err) {
+                console.error(err)
+                return
+            }
+            console.log('Zip file removed')
+        })
+    } catch (err) {
+        console.log(err)
+    }
 }
 
 
