@@ -11,6 +11,8 @@ const dotenv = require('dotenv')
 dotenv.config({ path: './config.env' })
 const fs = require('fs')
 
+const slugify = require('slugify')
+
 module.exports = class AdminController {
     constructor(blogPostService, themeService) {
         this.blogPostService = blogPostService
@@ -51,8 +53,11 @@ module.exports = class AdminController {
 
     async updatePost(req, res) {
         const id = req.params.id;
-        const { title, slug, content, draft } = req.body;
+        const { title, content, draft } = req.body;
+        let { slug } = req.body;
         const author = authenticator.findUserBySession(req.cookies.ssid).username;
+        const correctSlug = checkSlugCorrectness(slug)
+        if (!correctSlug) slug = slugify(title)
 
         const updatedPost = (draft) ? new NewPost(id, title, slug, author, new Date().toLocaleString().split(',')[0], null, content, true) : new NewPost(id, title, slug, author, new Date().toLocaleString().split(',')[0], new Date(), content, false)
         if (draft) await this.blogPostService.updatePostAsDraft(updatedPost, id)
@@ -67,13 +72,13 @@ module.exports = class AdminController {
         if (error == 1) error1 = 'We are sorry, but we can not change the database'
         if (success == 2) success2 = 'The configuration of MongoDB Connection successfully has been changed'
         if (error == 2) error2 = 'Weare sorry, but the provided details were not correct'
-        res.render('select-database', { 
-            layout: 'main', 
-            success1, 
-            error1, 
-            success2, 
-            error2, 
-            css: this.getTheme() 
+        res.render('select-database', {
+            layout: 'main',
+            success1,
+            error1,
+            success2,
+            error2,
+            css: this.getTheme()
         })
     }
 
@@ -122,13 +127,14 @@ module.exports = class AdminController {
         } catch (error) {
             console.log(error)
         }
-        res.render('select-theme', { 
-            layout: 'main', 
-            themeList, 
-            error, 
+        res.render('select-theme', {
+            layout: 'main',
+            themeList,
+            error,
             installError,
             installSuccess,
-            css: this.getTheme() })
+            css: this.getTheme()
+        })
     }
 
     setTheme(req, res) {
@@ -146,13 +152,13 @@ module.exports = class AdminController {
 
     installTheme(req, res) {
         const form = new formidable.IncomingForm();
-    
+
         form.parse(req);
-    
+
         form.on('fileBegin', function (name, file) {
             file.path = path.join(__dirname, '../uploaded/', file.name)
         });
-    
+
         form.on('file', function (name, file) {
             const fileType = file.type.split('/').pop();
             if (fileType === 'x-zip-compressed') {
@@ -168,10 +174,10 @@ module.exports = class AdminController {
                 res.redirect('/selectTheme?error=invalid-file-type');
             }
         });
-    
-        
+
+
     }
-    
+
 }
 
 
@@ -192,4 +198,11 @@ async function extractAndDeleteZippedFolder(zipPath, targetPath) {
     }
 }
 
+
+
+function checkSlugCorrectness(slug) {
+    const regexp = /^[a-zA-Z0-9-]+$/;
+    if (slug.search(regexp) === -1) return false
+    else return true
+}
 
