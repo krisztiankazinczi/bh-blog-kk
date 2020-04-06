@@ -33,7 +33,7 @@ module.exports = class AdminController {
             title: 'Blog Title',
             posts: await this.blogPostService.findAllPosts(),
             archive: await this.blogPostService.createArchive(),
-            css: this.theme
+            css: this.getTheme()
         });
     }
 
@@ -45,7 +45,7 @@ module.exports = class AdminController {
             title: post.title,
             post,
             archive: await this.blogPostService.createArchive(),
-            css: this.theme
+            css: this.getTheme()
         })
     }
 
@@ -73,7 +73,7 @@ module.exports = class AdminController {
             error1, 
             success2, 
             error2, 
-            css: this.theme 
+            css: this.getTheme() 
         })
     }
 
@@ -128,7 +128,7 @@ module.exports = class AdminController {
             error, 
             installError,
             installSuccess,
-            css: this.theme })
+            css: this.getTheme() })
     }
 
     setTheme(req, res) {

@@ -32,12 +32,12 @@ const selectedDb = process.env.SELECTED_DB
 
 let adminController, blogController;
 
-if (+selectedDb === 1) {
+if (selectedDb === 'mongodb') {
     const mongoDB = require('./repository/mongo-wrapper')
     const PostRepositoryMongo = require('./repository/posts-repository-mongo')
     adminController = new AdminController(new BlogPostService(new PostRepositoryMongo(new mongoDB())), new ThemeService());
     blogController = new BlogController(new BlogPostService(new PostRepositoryMongo(new mongoDB())), new ThemeService());
-} else if (+selectedDb === 0) {
+} else if (selectedDb === 'sqlite3') {
     const DB = require('./repository/db-wrapper');
     const PostRepository = require('./repository/posts_repository')
     blogController = new BlogController( new BlogPostService( new PostRepository( new DB() ) ), new ThemeService() );
