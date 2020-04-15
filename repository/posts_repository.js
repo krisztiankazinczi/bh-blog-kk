@@ -1,4 +1,5 @@
 const NewPost = require('../utils/NewPost')
+const setSizeOfTags = require('../utils/set-size-of-tags')
 
 module.exports = class PostRepository {
   constructor(db) {
@@ -115,8 +116,11 @@ module.exports = class PostRepository {
 
   async findTags() {
     const sqlFindAllTags = 'SELECT id, name FROM tags ORDER BY name DESC'
+    const sqlFindTagsInPOst = 'SELECT post_id, tag_id FROM tags_in_post'
     try {
       let tags = await this.db.all(sqlFindAllTags);
+      const tagsInPost = await this.db.all(sqlFindTagsInPOst)
+      tags = setSizeOfTags(tagsInPost, tags)
       return tags;
     } catch (error) {
       console.error(error);
