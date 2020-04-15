@@ -1,80 +1,91 @@
 <div class="col-12">
-    <div class="d-flex justify-content-center align-items-center vh-100">
-        <div class="container">
+  <div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="container">
 
 
-            <div class="row">
-                <div class="col-4 text-right"></div>
-                <div class="col-7">
-                    <h1>Create New Post</h1>
-                </div>
-            </div>
-            <form action="/newPost" method="POST" class="needs-validation" id="create-new-post">
-                <div class="row mt-5">
-                    <div class="col-3 text-right">
-                        <label for="title">Title</label>
-                    </div>
-                    <div class="col-7">
-                        <input type="text" class="w-75" id="title" name="title"
-                            {{#if error.titleValue}}value="{{error.titleValue}}" {{/if}}>
-                    </div>
-                </div>
-
-                <div class="row mt-4">
-                    <div class="col-3 text-right">
-                        <label for="slug">Slug</label>
-                    </div>
-                    <div class="col-7">
-                        <input type="text" class="w-75" id="slug" name="slug"
-                            {{#if error.slugValue}}value="{{error.slugValue}}" {{/if}}>
-                    </div>
-                </div>
-
-
-                <div class="row mt-4">
-                    <div class="col-3 text-right">
-                        <label for="content">Content</label>
-                    </div>
-                    <div class="col-7">
-                        <textarea class="w-75" rows="6" cols="50" name="content"
-                            id="content">{{#if error.contentValue}}{{error.contentValue}}{{/if}}</textarea>
-                    </div>
-                </div>
-                <div class="row mt-5">
-                    <div class="col-3 text-left">
-
-                    </div>
-                    <div class="col-7">
-                        <div class="row">
-                            <div class="col-3 text-center">
-                                <a href="http://localhost:3000/admin"><input class="btn btn-info text-white w-75"
-                                        value="Discard"></a>
-                            </div>
-                            <div class="col-4 text-center">
-                                <input id="save-draft" class="btn btn-info text-white w-75" value="Save as draft">
-                            </div>
-                            <div class="col-3 text-left">
-                                <input type="submit" class="btn btn-info text-white" value="Publish">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </form>
-            <div class="row mt-5">
-                <div class="col-3"></div>
-                <div class="col-7">
-                    <p id="error-message-to-user" class="text-danger">
-                        {{#if error.title_content}}{{error.title_content}}{{/if}}
-                        {{#if error.title}}{{error.title}}{{/if}}
-                        {{#if error.content}}{{error.content}}{{/if}}
-                    </p>
-                </div>
-
-            </div>
-
-
+      <div class="row">
+        <div class="col-4 text-right"></div>
+        <div class="col-7">
+          <h1>Create New Post</h1>
         </div>
+      </div>
+      <form action="/newPost" method="POST" class="needs-validation" id="create-new-post">
+        <div class="row mt-5">
+          <div class="col-3 text-right">
+            <label for="title">Title</label>
+          </div>
+          <div class="col-7">
+            <input type="text" class="w-75" id="title" name="title" {{#if error.titleValue}}value="{{error.titleValue}}"
+              {{/if}}>
+          </div>
+        </div>
+
+        <div class="row mt-4">
+          <div class="col-3 text-right">
+            <label for="slug">Slug</label>
+          </div>
+          <div class="col-7">
+            <input type="text" class="w-75" id="slug" name="slug" {{#if error.slugValue}}value="{{error.slugValue}}"
+              {{/if}}>
+          </div>
+        </div>
+
+        <div class="row mt-4">
+          <div class="col-3 text-right">
+            <label for="tags">Tags</label>
+          </div>
+          <div class="col-7">
+            <select type="text" class="w-75" id="tags" name="tags" multiple size="4">
+              {{#each tags}}
+              <option value={{this.id}}>{{this.name}}</option>
+              {{/each}}
+            </select>
+          </div>
+        </div>
+
+        <div class="row mt-4">
+          <div class="col-3 text-right">
+            <label for="content">Content</label>
+          </div>
+          <div class="col-7">
+            <textarea class="w-75" rows="6" cols="50" name="content"
+              id="content">{{#if error.contentValue}}{{error.contentValue}}{{/if}}</textarea>
+          </div>
+        </div>
+        <div class="row mt-5">
+          <div class="col-3 text-left">
+
+          </div>
+          <div class="col-7">
+            <div class="row">
+              <div class="col-3 text-center">
+                <a href="http://localhost:3000/admin"><input class="btn btn-info text-white w-75" value="Discard"></a>
+              </div>
+              <div class="col-4 text-center">
+                <input id="save-draft" class="btn btn-info text-white w-75" value="Save as draft">
+              </div>
+              <div class="col-3 text-left">
+                <input type="submit" class="btn btn-info text-white" value="Publish">
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+      <div class="row mt-5">
+        <div class="col-3"></div>
+        <div class="col-7">
+          <p id="error-message-to-user" class="text-danger">
+            {{#if error.title_content}}{{error.title_content}}{{/if}}
+            {{#if error.title}}{{error.title}}{{/if}}
+            {{#if error.content}}{{error.content}}{{/if}}
+          </p>
+        </div>
+
+      </div>
+
+
     </div>
+  </div>
 </div>
 
 
@@ -84,81 +95,85 @@
 
 <script>
 
-    const form = document.getElementById('create-new-post');
-    const errorMessageToUser = document.getElementById('error-message-to-user');
+  const form = document.getElementById('create-new-post');
+  const errorMessageToUser = document.getElementById('error-message-to-user');
 
-    form.addEventListener("submit", createNewPost, true);
+  form.addEventListener("submit", createNewPost, true);
 
-    function createNewPost(event) {
-        event.preventDefault();
+  function createNewPost(event) {
+    event.preventDefault();
 
-        const title = document.getElementById('title').value;
-        const slug = document.getElementById('slug').value;
-        const content = document.getElementById('content').value;
+    const title = document.getElementById('title').value;
+    const slug = document.getElementById('slug').value;
+    const content = document.getElementById('content').value;
 
-        if (!content && !title && !slug || !content && title.length < 5 && slug.length < 5 || !title && content.length < 5 && slug.length < 5 || !slug && content.length < 5 && title.length < 5 || title.length < 5 && content.length < 5 && slug.length < 5) errorMessageToUser.innerText = "Error! Title, Slug and Content are mandatory and the minimum length of these are 5 characters!";
-        else if (!title && !slug || !title && slug.length < 5 || !slug && title.length < 5 || title.length < 5 && slug.length < 5) errorMessageToUser.innerText = "Error! Both Title and Slug are mandatory and the minimum length of these are 5 character!";
-        else if (!title && !content || !title && content.length < 5 || !content && title.length < 5 || title.length < 5 && content.length < 5) errorMessageToUser.innerText = "Error! Both Title and Content are mandatory and the minimum length of these are 5 character!";
-        else if (!content && !slug || !content && slug.length < 5 || !slug && content.length < 5 || content.length < 5 && slug.length < 5) errorMessageToUser.innerText = "Error! Both Content and Slug are mandatory and the minimum length of these are 5 character!";
-        else if (!title || title.length < 5) errorMessageToUser.innerText = "Error! Title is mandatory and the minimum length is 5 character!";
-        else if (!slug || slug.length < 5) errorMessageToUser.innerText = "Error! Slug is mandatory and the minimum length is 5 character!";
-        else if (!content || content.length < 5) errorMessageToUser.innerText = "Error! Content is mandatory and the minimum length of it is 5 characters!";
-        else form.submit();
+    if (!content && !title && !slug || !content && title.length < 5 && slug.length < 5 || !title && content.length < 5 && slug.length < 5 || !slug && content.length < 5 && title.length < 5 || title.length < 5 && content.length < 5 && slug.length < 5) errorMessageToUser.innerText = "Error! Title, Slug and Content are mandatory and the minimum length of these are 5 characters!";
+    else if (!title && !slug || !title && slug.length < 5 || !slug && title.length < 5 || title.length < 5 && slug.length < 5) errorMessageToUser.innerText = "Error! Both Title and Slug are mandatory and the minimum length of these are 5 character!";
+    else if (!title && !content || !title && content.length < 5 || !content && title.length < 5 || title.length < 5 && content.length < 5) errorMessageToUser.innerText = "Error! Both Title and Content are mandatory and the minimum length of these are 5 character!";
+    else if (!content && !slug || !content && slug.length < 5 || !slug && content.length < 5 || content.length < 5 && slug.length < 5) errorMessageToUser.innerText = "Error! Both Content and Slug are mandatory and the minimum length of these are 5 character!";
+    else if (!title || title.length < 5) errorMessageToUser.innerText = "Error! Title is mandatory and the minimum length is 5 character!";
+    else if (!slug || slug.length < 5) errorMessageToUser.innerText = "Error! Slug is mandatory and the minimum length is 5 character!";
+    else if (!content || content.length < 5) errorMessageToUser.innerText = "Error! Content is mandatory and the minimum length of it is 5 characters!";
+    else form.submit();
+  }
+
+  const title = document.getElementById("title")
+  const slug = document.getElementById("slug")
+  title.addEventListener("keyup", generate_slug);
+
+  slug.addEventListener("dblclick", setSlugValue)
+
+  function setSlugValue() {
+    slug.value = slug.placeholder;
+  }
+
+  function generate_slug() {
+    const slugText = string_to_slug(title.value)
+    slug.placeholder = slugText;
+  }
+
+  function string_to_slug(str) {
+    str = str.replace(/^\s+|\s+$/g, ""); // trim
+    str = str.toLowerCase();
+
+    var from = "åàáãäâèéëêìíïîòóöôùúüûñç·/_,:;";
+    var to = "aaaaaaeeeeiiiioooouuuunc------";
+
+    for (var i = 0, l = from.length; i < l; i++) {
+      str = str.replace(new RegExp(from.charAt(i), "g"), to.charAt(i));
     }
 
-    const title = document.getElementById("title")
-    const slug = document.getElementById("slug")
-    title.addEventListener("keyup", generate_slug);
+    str = str
+      .replace(/[^a-z0-9 -]/g, "") // remove invalid chars
+      .replace(/\s+/g, "-") // collapse whitespace and replace by -
+      .replace(/-+/g, "-") // collapse dashes
+      .replace(/^-+/, "") // trim - from start of text
+      .replace(/-+$/, ""); // trim - from end of text
 
-    slug.addEventListener("dblclick", setSlugValue)
-
-    function setSlugValue() {
-        slug.value = slug.placeholder;
-    }
-
-    function generate_slug() {
-        const slugText = string_to_slug(title.value)
-        slug.placeholder = slugText;
-    }
-
-    function string_to_slug(str) {
-        str = str.replace(/^\s+|\s+$/g, ""); // trim
-        str = str.toLowerCase();
-
-        var from = "åàáãäâèéëêìíïîòóöôùúüûñç·/_,:;";
-        var to = "aaaaaaeeeeiiiioooouuuunc------";
-
-        for (var i = 0, l = from.length; i < l; i++) {
-            str = str.replace(new RegExp(from.charAt(i), "g"), to.charAt(i));
-        }
-
-        str = str
-            .replace(/[^a-z0-9 -]/g, "") // remove invalid chars
-            .replace(/\s+/g, "-") // collapse whitespace and replace by -
-            .replace(/-+/g, "-") // collapse dashes
-            .replace(/^-+/, "") // trim - from start of text
-            .replace(/-+$/, ""); // trim - from end of text
-
-        return str;
-    }
+    return str;
+  }
 
 
-    document.getElementById('save-draft').addEventListener('click', saveAsDraft);
+  document.getElementById('save-draft').addEventListener('click', saveAsDraft);
 
-    function saveAsDraft() {
-        const url = 'http://localhost:3000';
-        const data = { title: document.getElementById('title').value, slug: document.getElementById('slug').value, content: document.getElementById('content').value }
+  function saveAsDraft() {
+    const url = 'http://localhost:3000';
 
-        fetch(`${url}/draft`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        })
-        .then( res => {
-            window.location = res.url;
-        })
-    }
+    const selected = document.querySelectorAll('#tags option:checked');
+    const tags = Array.from(selected).map(el => el.value);
+
+    const data = { title: document.getElementById('title').value, slug: document.getElementById('slug').value, content: document.getElementById('content').value, tags }
+
+    fetch(`${url}/draft`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+      .then(res => {
+        window.location = res.url;
+      })
+  }
 
 </script>

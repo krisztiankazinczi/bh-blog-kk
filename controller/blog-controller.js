@@ -18,6 +18,7 @@ module.exports = class BlogController {
             title: 'Blog Title',
             blogs: blogs,
             archive: await this.blogPostService.createArchive(),
+            tags: await this.blogPostService.findTags(),
             css: this.themeService.createThemePath()
         });
     }
@@ -30,45 +31,66 @@ module.exports = class BlogController {
             title: post.title,
             post,
             archive: await this.blogPostService.createArchive(),
+            tags: await this.blogPostService.findTags(),
             css: this.themeService.createThemePath()
         })
     }
 
-    getAddPost(req, res) {
+    async getAddPost(req, res) {
         const error = createErrorObjectForAddPost(req.query);
 
         res.render('add-new-post', {
             layout: 'main',
             error,
+            tags: await this.blogPostService.findTags(),
             css: this.themeService.createThemePath()
         });
     }
 
 
     async post(req, res) {
-        const { title, content } = req.body;
+      //if there is no tag selected, the findBYId function wont work, since it's an inner join with tags_in_post table
+        const { title, content, tags } = req.body;
         let  { slug } = req.body;
         const author = authenticator.findUserBySession(req.cookies.ssid).username;
-
         const validateForm = validateNewPost(title, slug, content)
 
         if (validateForm) res.redirect(`/newPost?error=${validateForm[0]}&titleVal=${validateForm[1]}&slugVal=${validateForm[2]}&contentVal=${validateForm[3]}`);
         else {
             const correctSlug = checkSlugCorrectness(slug)
             if (!correctSlug) slug = slugify(title)
-            const newPost = new NewPost(undefined, title, slug, author, new Date().toLocaleString().split(',')[0], new Date(), content, false)
+            if (!slug.includes('-') && slug.length > 0) slug += '-' // I need this dash, because of getPost(idOrSlug) function needs a dash to identify if it's a slug or id
+            const newPost = new NewPost(undefined, title, slug, author, new Date().toLocaleString().split(',')[0], new Date(), content, false, tags)
             await this.blogPostService.createPost(newPost);
             res.redirect('/postList')
         }
     }
 
     async draft(req, res) {
-        const { title, slug, content } = req.body;
+      //if there is no tag selected, the findBYId function wont work, since it's an inner join with tags_in_post table
+        const { title, slug, content, tags } = req.body;
         const author = authenticator.findUserBySession(req.cookies.ssid).username;
-        const newPost = new NewPost(undefined, title, slug, author, new Date().toLocaleString().split(',')[0], null, content, true)
+        const newPost = new NewPost(undefined, title, slug, author, new Date().toLocaleString().split(',')[0], null, content, true, tags)
         await this.blogPostService.createDraft(newPost);
         res.redirect('/adminPostList');
     }
+
+
+    async getPostsByTag(req, res) {
+        const {id} = req.params
+        const blogs = await this.blogPostService.findPostsByTag(id)
+        res.render('post-list', {
+            layout: 'blog',
+            title: 'Post Title',
+            blogs,
+            archive: await this.blogPostService.createArchive(),
+            tags: await this.blogPostService.findTags(),
+            css: this.themeService.createThemePath()
+        })
+    }
+
+
+
 }
 
 

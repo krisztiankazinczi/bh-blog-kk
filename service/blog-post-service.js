@@ -40,6 +40,14 @@ class BlogPostService {
         return await this.getArchive();
     }
 
+    async findTags() {
+        return await this.postRepository.findTags()
+    }
+
+    async findPostsByTag(id) {
+        return await this.postRepository.findPostsByTag(id)
+    }
+
 
     async getArchive() {
         try {

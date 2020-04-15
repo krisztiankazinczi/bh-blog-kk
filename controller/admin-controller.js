@@ -35,6 +35,7 @@ module.exports = class AdminController {
             title: 'Blog Title',
             posts: await this.blogPostService.findAllPosts(),
             archive: await this.blogPostService.createArchive(),
+            tags: await this.blogPostService.findTags(),
             css: this.getTheme()
         });
     }
@@ -42,24 +43,30 @@ module.exports = class AdminController {
     async getPost(req, res) {
         const id = req.params.id;
         const post = await this.blogPostService.findPostById(id);
+        let tags = await this.blogPostService.findTags();
+        tags = findSelectedTags(post.tags, tags)
+        console.log(post, tags)
         res.render('admin-edit-post', {
             layout: 'blog',
             title: post.title,
             post,
             archive: await this.blogPostService.createArchive(),
+            tags,
             css: this.getTheme()
         })
     }
 
     async updatePost(req, res) {
+      //if there is no tag selected, the findBYId function wont work, since it's an inner join with tags_in_post table
         const id = req.params.id;
-        const { title, content, draft } = req.body;
+        const { title, content, draft, tags } = req.body;
         let { slug } = req.body;
         const author = authenticator.findUserBySession(req.cookies.ssid).username;
         const correctSlug = checkSlugCorrectness(slug)
-        if (!correctSlug) slug = slugify(title)
+        if (!correctSlug && title) slug = slugify(title)
+        if (!slug.includes('-') && slug.length > 0) slug += '-'
 
-        const updatedPost = (draft) ? new NewPost(id, title, slug, author, new Date().toLocaleString().split(',')[0], null, content, true) : new NewPost(id, title, slug, author, new Date().toLocaleString().split(',')[0], new Date(), content, false)
+        const updatedPost = (draft) ? new NewPost(id, title, slug, author, new Date().toLocaleString().split(',')[0], null, content, true, tags) : new NewPost(id, title, slug, author, new Date().toLocaleString().split(',')[0], new Date(), content, false, tags)
         if (draft) await this.blogPostService.updatePostAsDraft(updatedPost, id)
         else await this.blogPostService.updatePost(updatedPost, id)
         res.redirect('/adminPostList')
@@ -103,8 +110,8 @@ module.exports = class AdminController {
         const { url, username, password } = req.body;
         let configFile = fs.readFileSync('./config.env').toString()
         configFile = configFile.replace(`DATABASE=${process.env.DATABASE}`, `DATABASE=${url}`)
-        configFile = configFile.replace(`DATABASE_USERNAME=${process.env.DATABASE_USERNAME}`, `DATABASE=${username}`)
-        configFile = configFile.replace(`DATABASE_PASSWORD=${process.env.DATABASE_PASSWORD}`, `DATABASE=${password}`)
+        configFile = configFile.replace(`DATABASE_USERNAME=${process.env.DATABASE_USERNAME}`, `DATABASE_USERNAME=${username}`)
+        configFile = configFile.replace(`DATABASE_PASSWORD=${process.env.DATABASE_PASSWORD}`, `DATABASE_PASSWORD=${password}`)
         fs.writeFileSync('./config.env', configFile, err => {
             if (err) {
                 console.error(err)
@@ -206,3 +213,13 @@ function checkSlugCorrectness(slug) {
     else return true
 }
 
+
+function findSelectedTags(postTags, allTags) {
+  if (!Array.isArray(postTags)) return allTags
+  for (let i = 0; i < allTags.length; i++) {
+    for (let j = 0; j < postTags.length; j++) {
+      if (allTags[i].id == postTags[j] ) allTags[i]['selected'] = true;
+    } 
+  }
+  return allTags;
+}

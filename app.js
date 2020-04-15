@@ -56,6 +56,7 @@ const loginController = new LoginController( new ThemeService() );
     app.get('/newPost', authMiddleware, blogController.getAddPost.bind(blogController));
     app.post('/newPost', authMiddleware, blogController.post.bind(blogController));
     app.post('/draft', authMiddleware, blogController.draft.bind(blogController));
+    app.get('/tag/:id', blogController.getPostsByTag.bind(blogController))
 
     app.get('/login', loginController.get.bind(loginController));
     app.post('/login', loginController.post).bind(loginController);

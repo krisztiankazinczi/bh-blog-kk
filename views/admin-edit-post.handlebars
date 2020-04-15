@@ -1,128 +1,143 @@
 <div class="col-12 bg-secondary">
-    <div class="d-flex justify-content-center align-items-center vh-100">
-        <div class="container bg-secondary">
-
-            
-            <div class="row">
-                <div class="col-4 text-right"></div>
-                <div class="col-7">
-                    <h1 class="text-light">Edit Post</h1>
-                </div>
-            </div>
-            <form action="/updatePost/{{post.id}}" method="POST">
-                <div class="row mt-5">
-                    <div class="col-3 text-right text-light">
-                        <label for="title"><b>Title</b></label>
-                    </div>
-                    <div class="col-7">
-                        <input type="text" class="w-75" id="title" name="title"
-                            value="{{post.title}}">
-                        <input type="hidden" id="hidden-id" value="{{post.id}}">
-                    </div>
-                </div>
-
-                <div class="row mt-4">
-                    <div class="col-3 text-right text-light">
-                        <label for="slug"><b>Slug</b></label>
-                    </div>
-                    <div class="col-7">
-                        <input type="text" class="w-75" id="slug" name="slug"
-                            value="{{post.slug}}">
-                    </div>
-                </div>
+  <div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="container bg-secondary">
 
 
-                <div class="row mt-4">
-                    <div class="col-3 text-right text-light">
-                        <label for="content"><b>Content</b></label>
-                    </div>
-                    <div class="col-7">
-                        <textarea class="w-75" rows="6" cols="50" name="content"
-                            id="content">{{post.content}}</textarea>
-                    </div>
-                </div>
-                <div class="row mt-5">
-                    <div class="col-3 text-left">
-
-                    </div>
-                    <div class="col-7">
-                        <div class="row">
-                            <div class="col-3 text-center">
-                                <a href="http://localhost:3000/admin"><input class="btn btn-dark text-white w-75"
-                                        value="Discard"></a>
-                            </div>
-                            <div class="col-4 text-center">
-                                <input id="save-draft" class="btn btn-dark text-white w-75" value="Save as draft">
-                            </div>
-                            <div class="col-3 text-left">
-                                <input type="submit" class="btn btn-dark text-white" value="Publish">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </form>
-            <div class="row mt-5">
-                <div class="col-3"></div>
-                <div class="col-7">
-                    <p id="error-message-to-user" class="text-danger"></p>
-                </div>
-
-            </div>
-
-
+      <div class="row">
+        <div class="col-4 text-right"></div>
+        <div class="col-7">
+          <h1 class="text-light">Edit Post</h1>
         </div>
+      </div>
+      <form action="/updatePost/{{post.id}}" method="POST">
+        <div class="row mt-5">
+          <div class="col-3 text-right text-light">
+            <label for="title"><b>Title</b></label>
+          </div>
+          <div class="col-7">
+            <input type="text" class="w-75" id="title" name="title" value="{{post.title}}">
+            <input type="hidden" id="hidden-id" value="{{post.id}}">
+          </div>
+        </div>
+
+        <div class="row mt-4">
+          <div class="col-3 text-right text-light">
+            <label for="slug"><b>Slug</b></label>
+          </div>
+          <div class="col-7">
+            <input type="text" class="w-75" id="slug" name="slug" value="{{post.slug}}">
+          </div>
+        </div>
+
+        <div class="row mt-4">
+          <div class="col-3 text-right">
+            <label for="tags">Tags</label>
+          </div>
+          <div class="col-7">
+            <select type="text" class="w-75" id="tags" name="tags" multiple size="4">
+              {{#each tags}}
+              {{#if this.selected}}<option value={{this.id}} selected>{{this.name}}</option>{{/if}}
+              {{#unless this.selected}}<option value={{this.id}}>{{this.name}}</option>{{/unless}}
+              {{/each}}
+            </select>
+          </div>
+        </div>
+
+
+        <div class="row mt-4">
+          <div class="col-3 text-right text-light">
+            <label for="content"><b>Content</b></label>
+          </div>
+          <div class="col-7">
+            <textarea class="w-75" rows="6" cols="50" name="content" id="content">{{post.content}}</textarea>
+          </div>
+        </div>
+        <div class="row mt-5">
+          <div class="col-3 text-left">
+
+          </div>
+          <div class="col-7">
+            <div class="row">
+              <div class="col-3 text-center">
+                <a href="http://localhost:3000/admin"><input class="btn btn-dark text-white w-75" value="Discard"></a>
+              </div>
+              <div class="col-4 text-center">
+                <input id="save-draft" class="btn btn-dark text-white w-75" value="Save as draft">
+              </div>
+              <div class="col-3 text-left">
+                <input type="submit" class="btn btn-dark text-white" value="Publish">
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+      <div class="row mt-5">
+        <div class="col-3"></div>
+        <div class="col-7">
+          <p id="error-message-to-user" class="text-danger"></p>
+        </div>
+
+      </div>
+
+
     </div>
+  </div>
 </div>
 
 <script>
-        const title = document.getElementById("title")
-    const slug = document.getElementById("slug")
-    title.addEventListener("keyup", generate_slug);
+  const title = document.getElementById("title")
+  const slug = document.getElementById("slug")
+  title.addEventListener("keyup", generate_slug);
 
-    function generate_slug() {
-        const slugText = string_to_slug(title.value)
-        slug.value = slugText;
+  function generate_slug() {
+    const slugText = string_to_slug(title.value)
+    slug.value = slugText;
+  }
+
+  function string_to_slug(str) {
+    str = str.replace(/^\s+|\s+$/g, ""); // trim
+    str = str.toLowerCase();
+
+    var from = "åàáãäâèéëêìíïîòóöôùúüûñç·/_,:;";
+    var to = "aaaaaaeeeeiiiioooouuuunc------";
+
+    for (var i = 0, l = from.length; i < l; i++) {
+      str = str.replace(new RegExp(from.charAt(i), "g"), to.charAt(i));
     }
 
-    function string_to_slug(str) {
-        str = str.replace(/^\s+|\s+$/g, ""); // trim
-        str = str.toLowerCase();
+    str = str
+      .replace(/[^a-z0-9 -]/g, "") // remove invalid chars
+      .replace(/\s+/g, "-") // collapse whitespace and replace by -
+      .replace(/-+/g, "-") // collapse dashes
+      .replace(/^-+/, "") // trim - from start of text
+      .replace(/-+$/, ""); // trim - from end of text
 
-        var from = "åàáãäâèéëêìíïîòóöôùúüûñç·/_,:;";
-        var to = "aaaaaaeeeeiiiioooouuuunc------";
+    return str;
+  }
 
-        for (var i = 0, l = from.length; i < l; i++) {
-            str = str.replace(new RegExp(from.charAt(i), "g"), to.charAt(i));
-        }
+  document.getElementById('save-draft').addEventListener('click', saveAsDraft);
 
-        str = str
-            .replace(/[^a-z0-9 -]/g, "") // remove invalid chars
-            .replace(/\s+/g, "-") // collapse whitespace and replace by -
-            .replace(/-+/g, "-") // collapse dashes
-            .replace(/^-+/, "") // trim - from start of text
-            .replace(/-+$/, ""); // trim - from end of text
+  function saveAsDraft() {
+    const url = 'http://localhost:3000';
+    // to send all the selected options
+    const selected = document.querySelectorAll('#tags option:checked');
+    const tags = Array.from(selected).map(el => el.value);
 
-        return str;
-    }
 
-    document.getElementById('save-draft').addEventListener('click', saveAsDraft);
+    const data = { title: document.getElementById('title').value, slug: document.getElementById('slug').value, content: document.getElementById('content').value, tags, draft: true }
 
-    function saveAsDraft() {
-        const url = 'http://localhost:3000';
-        const data = { title: document.getElementById('title').value, slug: document.getElementById('slug').value, content: document.getElementById('content').value, draft: true }
+    const id = document.getElementById('hidden-id').value;
 
-        const id = document.getElementById('hidden-id').value;
-        
-        fetch(`${url}/updatePost/${id}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        })
-        .then( res => {
-            window.location = res.url;
-        })
-    }
+    fetch(`${url}/updatePost/${id}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+      .then(res => {
+        window.location = res.url;
+      })
+  }
 
-    </script>
+</script>

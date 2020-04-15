@@ -35,12 +35,12 @@ module.exports = class DB {
     run(sqlString, params) {
         return new Promise((resolve, reject) => {
             db.serialize(() => {
-                db.run(sqlString, params, function (err, lastId) {
+                db.run(sqlString, params, function (err) {
                     if (err) {
                         reject(err);
                         return
                     }
-                    resolve(lastId)
+                    resolve(this.lastID)
                 })
             })
         })

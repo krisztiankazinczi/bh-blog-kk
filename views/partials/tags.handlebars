@@ -1,0 +1,12 @@
+<div class="container bg-secondary text-white vh-100 overflow-auto">
+    <div class="row">
+        <div class="col-12">
+            <h3 class="pt-2">Tags</h3><br>
+            {{#each tags}}
+                &nbsp;&nbsp;&nbsp;&nbsp;<h6><a class="text-white" href="http://localhost:3000/tag/{{this.id}}">{{this.name}}</a></h6>
+            {{/each}}
+        </div>
+
+    </div>
+
+</div>
