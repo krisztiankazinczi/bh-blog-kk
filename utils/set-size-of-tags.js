@@ -6,19 +6,15 @@ const mediumFontSizeClassName = "medium-font-size"
 const bigFontSizeClassName = "big-font-size"
 
 module.exports = function setSizeOfTags(tagsInPost, tags) {
-  for (let i = 0; i < tagsInPost.length; i++) {
-    for (let j = 0; j < tags.length; j++) {
-      if (tagsInPost[i].tag_id === tags[j].id) {
-        if (!tags[j]['size']) tags[j]['size'] = 1;
-        else tags[j]['size'] += 1;
-      } 
-    } 
-  }
+  
+  tagsInPost.forEach(postTag => tags.map(tag => {
+    if (postTag.tag_id === tag.id) (!tag['size']) ? tag['size'] = 1 : tag['size'] += 1;
+  }))
 
   tags.map(tag => {
     if (tag.size <= SMALL_TAG) return tag.size = smallFontSizeClassName
     else if (tag.size <= MEDIUM_TAG) return tag.size = mediumFontSizeClassName
-    if (tag.size > MEDIUM_TAG) return tag.size = bigFontSizeClassName
+    else if (tag.size > MEDIUM_TAG) return tag.size = bigFontSizeClassName
   })
 
   return tags;
