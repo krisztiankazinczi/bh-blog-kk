@@ -1,10 +1,11 @@
-const authenticator = require('../service/authenticator');
+const Authenticator = require('../service/authenticator');
 
 const AUTH_COOKIE = 'ssid';
 
 module.exports = class LoginController {
-    constructor(themeService) {
+    constructor(themeService, authenticator) {
         this.themeService = themeService
+        this.authenticator = authenticator
     }
 
     get(req, res) {
@@ -16,12 +17,11 @@ module.exports = class LoginController {
         res.render('login', {layout: 'main', error, successLogout, css: this.themeService.createThemePath()});
     }
 
-    post(req, res) {
+    async post(req, res) {
         const {username, pw} = req.body;
-        
-        if (authenticator.authenticate(username, pw)) {
-            const user = authenticator.authenticate(username, pw);
-            const session = authenticator.registerSession(user)
+        const user = await this.authenticator.authenticate(username, pw);
+        if (user) {
+            const session = this.authenticator.registerSession(user)
             res.cookie(AUTH_COOKIE, session.id)
             res.redirect('/admin')
             
@@ -31,7 +31,7 @@ module.exports = class LoginController {
 
     logout(req, res) {
         res.clearCookie(AUTH_COOKIE)
-        const logout = authenticator.deleteSession(req.session.id)
+        const logout = new Authenticator().deleteSession(req.session.id)
         if (logout) res.redirect('/login?logout=successful')
         else res.redirect('/admin')
     }

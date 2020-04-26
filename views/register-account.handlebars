@@ -1,0 +1,191 @@
+<style>
+  .border-3 {
+    border-width: 3px !important;
+  }
+</style>
+
+
+<div class="col-12">
+  <div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="container">
+
+      <div class="form-group">
+        <div class="row mt-3">
+          <div class="col-5 text-right">
+            <label for="name">Name</label>
+          </div>
+          <div class="col-7">
+            <input type="text" class="form-control w-50" id="name" name="name">
+            <small id="name_error" class="text-danger"></small>
+          </div>
+        </div>
+
+        <div class="row mt-3">
+          <div class="col-5 text-right">
+            <label for="username">Username</label>
+          </div>
+          <div class="col-7">
+            <input type="text" class="form-control w-50" id="username" name="username">
+            <small id="username_error" class="text-danger"></small>
+          </div>
+        </div>
+
+
+        <div class="row mt-3">
+          <div class="col-5 text-right">
+            <label for="pw">Password</label>
+          </div>
+          <div class="col-7">
+            <input type="password" class="form-control w-50" id="pw" name="pw">
+            <small id="pw_error" class="text-danger"></small>
+          </div>
+        </div>
+
+        <div class="row mt-3">
+          <div class="col-5 text-right">
+            <label for="pw_confirm">Confirm Password</label>
+          </div>
+          <div class="col-7">
+            <input type="password" class="form-control w-50" id="pw_confirm" name="pw_confirm">
+            <small id="pw_confirm_error" class="text-danger"></small>
+          </div>
+        </div>
+
+        <div class="row mt-3">
+          <div class="col-5 text-right">
+            <label for="email">Email address</label>
+          </div>
+          <div class="col-7">
+            <input type="text" class="form-control w-50" id="email" name="email">
+            <small id="email_error" class="text-danger"></small>
+          </div>
+        </div>
+
+        <div class="row mt-3">
+          <div class="col-5 text-right">
+            <label for="authority">Authority</label>
+          </div>
+          <div class="col-7">
+            <select name="authority" id="authority">
+              <option value="author">Author</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+        </div>
+
+
+        <div class="row mt-3">
+          <div class="col-5">
+
+          </div>
+          <div class="col-7">
+            <button class="btn btn-info text-white form-control w-50" value="Create Account"
+              onclick="registerNewUser()">Create Account</button>
+          </div>
+        </div>
+        <div class="row mt-3">
+          <div class="col-5">
+
+          </div>
+          <div class="col-7">
+            <p id="success" class="text-success w-50"></p>
+            <p id="error" class="text-danger w-50"></p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+
+
+<script>
+  const url = `http://localhost:3000/registerNewUser`
+
+  const registerNewUser = () => {
+
+    // ---------------------------------------------------Collect all the necessary fields for validation--------------------------------------------------------------------
+
+    const name = document.getElementById('name')
+    const username = document.getElementById('username')
+    const pw = document.getElementById('pw')
+    const pw_confirm = document.getElementById('pw_confirm')
+    const email = document.getElementById('email')
+    const authority = document.getElementById('authority')
+    const nameError = document.getElementById('name_error')
+    const usernameError = document.getElementById('username_error')
+    const pwError = document.getElementById('pw_error')
+    const pwConfirmError = document.getElementById('pw_confirm_error')
+    const emailError = document.getElementById('email_error')
+    const success = document.getElementById('success')
+    const error = document.getElementById('error')
+
+    //---------------------------------------------------This objectum literal form is needed for the validation functions----------------------------------
+
+    const fields = { name, username, pw, pw_confirm, email }
+    const errorMessageContainer = { name: nameError, username: usernameError, pw: pwError, pw_confirm: pwConfirmError, email: emailError, error }
+
+    //---------------------------------------------------Delete the previous validation errors---------------------------------------------------
+
+    deleteErrorMessages(nameError, usernameError, pwError, pwConfirmError, emailError, error)
+    deleteBorders(name, username, pw, pw_confirm, email)
+
+    // --------------------------------------------------Front-end Validation (other validation functions in public -> front-end-js file)---------------------------------------------------------------------
+    
+    const errorObject = validateForm({ name: name.value, username: username.value, pw: pw.value, pw_confirm: pw_confirm.value, email: email.value })
+
+    if (Object.keys(errorObject).length) {
+      createErrorView(errorObject, fields, errorMessageContainer, pw, pw_confirm)
+      return
+    }
+
+    //---------------------------------------------------Fetch to back-end -------------------------------------------------------------------------------------
+
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: name.value, username: username.value, pw: pw.value, pw_confirm: pw_confirm.value, email: email.value, authority: authority.value })
+    })
+      .then(res => res.json())
+      .then(res => {
+        if (!Object.keys(res).length) {
+          success.innerText = 'User successfully created!'
+          resetFields(name, username, pw, pw_confirm, email)
+          setTimeout(() => success.innerText = '', 2000)
+        } else {
+          createErrorView(res, fields, errorMessageContainer, pw, pw_confirm)
+        }
+      })
+      .catch(res => {
+        error.innerText = `The server is down, please try again later`
+      })
+  }
+
+//---------------------------------------------------These functions creates and deletes the errorous part of the form---------------------------------------------------
+
+  const resetFields = (...formFields) => [...formFields].forEach(field => field.value = '')
+
+  const deleteErrorMessages = (...errorContainers) => [...errorContainers].forEach(container => container.innerText = '')
+
+  const deleteBorders = (...formFields) => [...formFields].forEach(field => field.setAttribute('class', 'w-50 form-control'))
+
+  const createErrorView = (errorObject, fields, errorMessageContainer, pw, pw_confirm) => {
+    for (let [key, value] of Object.entries(errorObject)) {
+        if (fields.hasOwnProperty(key)) fields[key].setAttribute('class', 'form-control border border-3 border-danger w-50')
+        if (errorMessageContainer.hasOwnProperty(key)) errorMessageContainer[key].innerText = value
+         // this is a special error - it highlights the 2 password fields
+        if (key === 'pw_error') {
+          pw.setAttribute('class', 'form-control border border-3 border-danger w-50')
+          pw_confirm.setAttribute('class', 'form-control border border-3 border-danger w-50')
+          error.innerText = value
+        }
+
+      }
+  }
+
+  // --------------------------------------------------------------------End--------------------------------------------------------------------
+
+</script>

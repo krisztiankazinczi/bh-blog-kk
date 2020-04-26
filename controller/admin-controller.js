@@ -1,6 +1,8 @@
 const authenticator = require('../service/authenticator');
 const NewPost = require('../utils/NewPost');
 
+const validateForm = require('./validation/register-account-validation')
+
 //for file upload, unzipping
 const formidable = require('formidable');
 const extract = require('extract-zip')
@@ -14,9 +16,10 @@ const fs = require('fs')
 const slugify = require('slugify')
 
 module.exports = class AdminController {
-    constructor(blogPostService, themeService) {
+    constructor(blogPostService, themeService, userService) {
         this.blogPostService = blogPostService
         this.themeService = themeService
+        this.userService = userService
         this.theme = this.themeService.createThemePath()
     }
 
@@ -181,9 +184,48 @@ module.exports = class AdminController {
                 res.redirect('/selectTheme?error=invalid-file-type');
             }
         });
-
-
     }
+
+    async findAccounts(req, res) {
+      let users;
+      try {
+        users = await this.userService.findUsers()
+      } catch (error) {
+        console.log(error)
+      }
+
+      res.render('accounts', {
+        layout: 'main',
+        users,
+        css: this.getTheme()
+      })
+    }
+
+    newAccount(req, res) {
+      res.render('register-account', {
+        layout: 'main',
+        css: this.getTheme()
+      })
+    }
+
+    async createNewAccount(req, res) {
+      const { name, username, pw, pw_confirm, email, authority } = req.body;
+
+      const errorObject = validateForm({ name, username, pw, pw_confirm, email, authority })
+      
+      if (!Object.keys(errorObject).length) {
+        try {
+          await this.userService.registerUser({ name, username, pw, email, authority })
+          res.json({})
+          return
+        } catch (error) {
+          res.json({error: 'We are sorry, but something went wrong, please try again later'})
+        }
+      } else {
+        res.json(errorObject)
+      }
+    }
+
 
 }
 

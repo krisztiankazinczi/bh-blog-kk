@@ -1,19 +1,28 @@
-const users = require('../data/registered-users');
 const sessions = require('../data/sessions');
 const uid = require('uid-safe')
 
 const SSID_LENGTH = 18;
 
-class Authenticator {
+module.exports = class Authenticator {
+  constructor(userRepository) {
+    this.userRepository = userRepository
+  }
     
     getSessions() {
         return sessions;
     }
 
-    authenticate(username, password) {
-        const user = users.find(u => u.username === username)
+    async authenticate(username, password) {
+      try {
+        const user = await this.userRepository.findUserByUsername(username)
+        // const user = users.find(u => u.username === username)
         if (user && user.password === password) return user
-        else return false
+        return null
+      } catch (error) {
+        console.log(error)
+        return null
+      }
+        
     }
 
     registerSession(user) {
@@ -23,6 +32,7 @@ class Authenticator {
     }
 
     deleteSession(sessionId) {
+      console.log('nem jut be ide')
         const idx = sessions.findIndex(session => session.id === sessionId);
         if (idx !== -1){
             sessions.splice(idx, 1)
@@ -37,4 +47,4 @@ class Authenticator {
 
 }
 
-module.exports = new Authenticator(users, sessions);
+

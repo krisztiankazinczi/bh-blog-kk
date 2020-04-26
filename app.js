@@ -7,6 +7,8 @@ const BlogController = require('./controller/blog-controller')
 const LoginController = require('./controller/login-controller')
 const AdminController = require('./controller/admin-controller')
 
+const UserService = require('./service/user-service')
+
 const ThemeService = require('./service/theme-service')
 
 const authMiddleware = require('./middlewares/authMiddleware')
@@ -30,25 +32,28 @@ dotenv.config({ path: './config.env' })
 
 const selectedDb = process.env.SELECTED_DB
 
-let adminController, blogController;
+let adminController, blogController, loginController;
 
 if (selectedDb === 'mongodb') {
     const mongoDB = require('./repository/mongo-wrapper')
     const PostRepositoryMongo = require('./repository/posts-repository-mongo')
-    adminController = new AdminController(new BlogPostService(new PostRepositoryMongo(new mongoDB())), new ThemeService());
+    adminController = new AdminController(new BlogPostService(new PostRepositoryMongo(new mongoDB())), new ThemeService() );
     blogController = new BlogController(new BlogPostService(new PostRepositoryMongo(new mongoDB())), new ThemeService());
 } else if (selectedDb === 'sqlite3') {
     const DB = require('./repository/db-wrapper');
     const PostRepository = require('./repository/posts_repository')
+    const UserRepository = require('./repository/user-repository')
+    const Authenticator = require('./service/authenticator');
+
+    loginController = new LoginController( new ThemeService(), new Authenticator( new UserRepository( new DB() ) ) );
     blogController = new BlogController( new BlogPostService( new PostRepository( new DB() ) ), new ThemeService() );
-    adminController = new AdminController( new BlogPostService( new PostRepository( new DB() ) ), new ThemeService() );
+    adminController = new AdminController( new BlogPostService( new PostRepository( new DB() ) ), new ThemeService(), new UserService( new UserRepository( new DB() ) ) );
 } else {
     console.log('there must be a mistake in the config file, because we have no db like this')
 }
 
 
 
-const loginController = new LoginController( new ThemeService() );
     
 
     app.get('/postList', blogController.get.bind(blogController));
@@ -59,7 +64,7 @@ const loginController = new LoginController( new ThemeService() );
     app.get('/tag/:id', blogController.getPostsByTag.bind(blogController))
 
     app.get('/login', loginController.get.bind(loginController));
-    app.post('/login', loginController.post).bind(loginController);
+    app.post('/login', loginController.post.bind(loginController));
 
     app.get('/admin', authMiddleware, adminController.getDashboard.bind(adminController));
     app.get('/adminPostList', authMiddleware, adminController.getPosts.bind(adminController));
@@ -71,6 +76,9 @@ const loginController = new LoginController( new ThemeService() );
     app.get('/selectTheme', authMiddleware, adminController.findThemes.bind(adminController))
     app.post('/selectTheme', authMiddleware, adminController.setTheme.bind(adminController))
     app.post('/installTheme', authMiddleware, adminController.installTheme.bind(adminController))
+    app.get('/accounts', authMiddleware, adminController.findAccounts.bind(adminController))
+    app.get('/createAccount',  adminController.newAccount.bind(adminController))
+    app.post('/registerNewUser',  adminController.createNewAccount.bind(adminController))
 
     app.get('/logout', authMiddleware, loginController.logout)
 

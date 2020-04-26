@@ -29,8 +29,22 @@ module.exports = class PostRepository {
   }
 
   async findPostById(id) {
-    const sqlGetPostById = 'SELECT posts.id, posts.title, posts.slug, posts.author, posts.content, posts.draft, group_concat(tags_in_post.tag_id) as tags FROM tags_in_post INNER JOIN posts ON posts.id = tags_in_post.post_id WHERE posts.id = ?'
     // const sqlGetPostById = 'SELECT id, title, slug, author, last_modified_at, published_at, content, draft FROM posts WHERE id = ?'
+    const sqlGetPostById = `SELECT
+        posts.id,
+        posts.title,
+        posts.slug,
+        posts.author,
+        posts.content,
+        posts.draft,
+        group_concat(tags_in_post.tag_id) as tags
+      FROM
+        tags_in_post
+      RIGHT JOIN
+        posts ON posts.id = tags_in_post.post_id
+      WHERE
+        posts.id = ?`
+
     try {
       let post = await this.db.get(sqlGetPostById, [id]);
       post = new NewPost(post.id, post.title, post.slug, post.author, post.last_modified_at, post.published_at, post.content, post.draft, post.tags ? post.tags.split(',') : post.tags)
@@ -104,9 +118,10 @@ module.exports = class PostRepository {
     try {
       await this.db.run(sqlSavePostAsDraft, [updatedPost.title, updatedPost.author, updatedPost.slug, updatedPost.last_modified_at, null, updatedPost.content, "1", id])
       await this.db.run(deleteExistingTags, [id])
-      if (!updatedPost.tags) { }
-      else if (typeof updatedPost.tags === 'string') await this.db.run(sqladdTags, [id, updatedPost.tags])
-      else if (Array.isArray(updatedPost.tags)) await Promise.all(updatedPost.tags.map(tag => this.db.run(sqladdTags, [id, tag])))
+      if (updatedPost.tags) {
+        await Promise.all(updatedPost.tags.map(tag => this.db.run(sqladdTags, [id, tag])))
+      }
+      //else if (typeof updatedPost.tags === 'string') await this.db.run(sqladdTags, [id, updatedPost.tags])
     
     } catch (error) {
       console.error(error);

@@ -1,0 +1,67 @@
+<div class="container">
+  <div class="table-responsive">
+    <table class="table table-striped table-bordered table-hover">
+      <thead>
+        <tr>
+          <div class="row">
+            <div class="col-2">
+              <th class="align-middle text-center">Name</th>
+            </div>
+            <div class="col-1">
+              <th class="align-middle text-center">Username</th>
+            </div>
+            <div class="col-2">
+              <th class="align-middle text-center">Password</th>
+            </div>
+            <div class="col-3">
+              <th class="align-middle text-center">Email</th>
+            </div>
+            <div class="col-1">
+              <th class="align-middle text-center">isAdmin</th>
+            </div>
+            <div class="col-1">
+              <th class="align-middle text-center">isSuperAdmin</th>
+            </div>
+            <div class="col-2">
+              <th class="align-middle text-center">Operations</th>
+            </div>
+          </div>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each users}}
+        <div class="row">
+          <tr>
+            <div class="col-2">
+              <td class="align-middle text-center">{{this.name}}</td>
+            </div>
+            <div class="col-1">
+              <td class="align-middle text-center">{{this.username}}</td>
+            </div>
+            <div class="col-2">
+              <td class="align-middle text-center">{{this.password}}</td>
+            </div>
+            <div class="col-3">
+              <td class="align-middle text-center">{{this.email}}</td>
+            </div>
+            <div class="col-1">
+              <td class="align-middle text-center">{{#if this.isAdmin}}Yes{{/if}}{{#unless this.isAdmin}}No{{/unless}}
+              </td>
+            </div>
+            <div class="col-1">
+              <td class="align-middle text-center">
+                {{#if this.isSuperAdmin}}Yes{{/if}}{{#unless this.isSuperAdmin}}No{{/unless}}</td>
+            </div>
+            <div class="col-2">
+              <td>
+                <button class="align-middle btn btn-info">Edit</button>
+                <button class="align-middle btn btn-danger ml-3">Delete</button>
+              </td>
+            </div>
+          </tr>
+        </div>
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+</div>

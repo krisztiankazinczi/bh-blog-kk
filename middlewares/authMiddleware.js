@@ -1,4 +1,5 @@
-const authenticator = require('../service/authenticator');
+const Authenticator = require('../service/authenticator');
+const authenticator = new Authenticator()
 
 const AUTH_COOKIE = 'ssid';
 
