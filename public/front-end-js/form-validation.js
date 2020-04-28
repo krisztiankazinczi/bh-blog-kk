@@ -1,6 +1,6 @@
 function validateForm(validationValues) {
   let errorObject = {}
-  if (!comparePasswords(validationValues.pw, validationValues.pw_confirm)) return errorObject = {...errorObject, 'pw_error': 'Please use the same password in the password confirmation field as in password field was used'}
+  if (validationValues.pw_confirm && !comparePasswords(validationValues.pw, validationValues.pw_confirm)) return errorObject = {...errorObject, 'pw_error': 'Please use the same password in the password confirmation field as in password field was used'}
 
   for (let [key, value] of Object.entries(validationValues)) {
 

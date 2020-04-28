@@ -33,4 +33,40 @@ module.exports = class LoginService {
     }
   }
 
+  async checkIfUsernameOrEmailExist(username, email) {
+    try {
+      const existsOrNot = await this.userRepository.checkIfUsernameOrEmailExist(username, email)
+      return existsOrNot;
+    } catch (error) {
+      return error
+    }
+  }
+
+  async findUserById(id) {
+    try {
+      const userDetails = await this.userRepository.findUserById(id)
+      return userDetails
+    } catch (error) {
+      return error
+    }
+  }
+
+  async editUserData(userData) {
+    try {
+      const editedUser = new NewUser(userData.id, userData.name, userData.username, userData.pw, userData.email, userData.authority === 'admin' ? 1 : 0, userData.authority === 'superAdmin' ? 1 : 0)
+      await this.userRepository.editUserData(editedUser)
+    } catch (error) {
+      return error
+    }
+  }
+
+  async isNewUsernameOrEmailExists(username, email, id) {
+    try {
+      const existsOrNot = await this.userRepository.isNewUsernameOrEmailExists(username, email, id)
+      return existsOrNot;
+    } catch (error) {
+      return error
+    }
+  }
+
 }

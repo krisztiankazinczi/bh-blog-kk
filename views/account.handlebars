@@ -1,0 +1,240 @@
+<style>
+  .border-3 {
+    border-width: 3px !important;
+  }
+</style>
+
+
+<div class="col-12">
+  <div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="container">
+      <div class="row">
+        <div class="col-4"></div>
+        <div class="col-5">
+          <h1>{{#if user}}Update Account Details{{/if}}{{#unless user}}Create Account{{/unless}}</h1>
+        </div>
+        <div class="col-3"></div>
+      </div>
+
+      <div class="form-group">
+        <div class="row mt-3">
+          <div class="col-5 text-right">
+            <label for="name">Name</label>
+          </div>
+          <div class="col-7">
+            <input type="text" class="form-control w-50" id="name" name="name" {{#if user}}value="{{user.name}}"
+              {{/if}}>
+            <small id="name_error" class="text-danger"></small>
+          </div>
+        </div>
+
+        <div class="row mt-3">
+          <div class="col-5 text-right">
+            <label for="username">Username</label>
+          </div>
+          <div class="col-7">
+            <input type="text" class="form-control w-50" id="username" name="username"
+              {{#if user}}value="{{user.username}}" {{/if}}>
+            <small id="username_error" class="text-danger"></small>
+          </div>
+        </div>
+
+
+        <div class="row mt-3">
+          <div class="col-5 text-right">
+            <label for="pw">Password</label>
+          </div>
+          <div class="col-7">
+            <input type="password" class="form-control w-50" id="pw" name="pw" {{#if user}}value="{{user.password}}"
+              {{/if}}>
+            <small id="pw_error" class="text-danger"></small>
+          </div>
+        </div>
+        {{#unless user}}
+        <div class="row mt-3">
+          <div class="col-5 text-right">
+            <label for="pw_confirm">Confirm Password</label>
+          </div>
+          <div class="col-7">
+            <input type="password" class="form-control w-50" id="pw_confirm" name="pw_confirm">
+            <small id="pw_confirm_error" class="text-danger"></small>
+          </div>
+        </div>
+        {{/unless}}
+        <div class="row mt-3">
+          <div class="col-5 text-right">
+            <label for="email">Email address</label>
+          </div>
+          <div class="col-7">
+            <input type="text" class="form-control w-50" id="email" name="email" {{#if user}}value="{{user.email}}"
+              {{/if}}>
+            <small id="email_error" class="text-danger"></small>
+          </div>
+        </div>
+
+        <div class="row mt-3">
+          <div class="col-5 text-right">
+            <label for="authority">Authority</label>
+          </div>
+          <div class="col-7">
+            <select name="authority" id="authority">
+              <option value="author" {{#unless user.isAdmin}}selected{{/unless}}>Author</option>
+              <option value="admin" {{#if user.isAdmin}}selected{{/if}}>Admin</option>
+            </select>
+          </div>
+        </div>
+
+
+        <div class="row mt-3">
+          <div class="col-5">
+
+          </div>
+          <div class="col-7">
+            <button class="btn btn-info text-white form-control w-50" value="Create Account"
+              onclick={{#if user}}"modifyUser({{user.id}})"{{/if}}{{#unless user}}"modifyUser()"{{/unless}}>{{#if user}}Update Account Details{{/if}}{{#unless user}}Create
+              Account{{/unless}}</button>
+          </div>
+        </div>
+        <div class="row mt-3">
+          <div class="col-5">
+
+          </div>
+          <div class="col-7">
+            <p id="success" class="text-success w-50"></p>
+            <p id="error" class="text-danger w-50"></p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+
+  // ---------------------------------------------------Register new user and edit user details in 1 file!!!!---------------------------------------------------
+  const url = `http://localhost:3000`
+
+  const modifyUser = (id) => {
+
+    // ---------------------------------------------------Collect all the necessary fields for validation--------------------------------------------------------------------
+    const name = document.getElementById('name')
+    const username = document.getElementById('username')
+    const pw = document.getElementById('pw')
+    if (document.getElementById('pw_confirm')) {
+      const pw_confirm = document.getElementById('pw_confirm')
+      const pwConfirmError = document.getElementById('pw_confirm_error')
+    }
+    const email = document.getElementById('email')
+    const authority = document.getElementById('authority')
+    const nameError = document.getElementById('name_error')
+    const usernameError = document.getElementById('username_error')
+    const pwError = document.getElementById('pw_error')
+    const emailError = document.getElementById('email_error')
+    const success = document.getElementById('success')
+    const error = document.getElementById('error')
+
+    //---------------------------------------------------This objectum literal form is needed for the validation functions----------------------------------
+
+    let fields = { name, username, pw, email }
+    if (document.getElementById('pw_confirm')) fields = { ...fields, pw_confirm }
+    let errorMessageContainer = { name: nameError, username: usernameError, pw: pwError, email: emailError, error }
+    if (document.getElementById('pw_confirm')) errorMessageContainer = { ...errorMessageContainer, pw_confirm: document.getElementById('pw_confirm_error') }
+
+    //---------------------------------------------------Delete the previous validation errors---------------------------------------------------
+
+    document.getElementById('pw_confirm') ? deleteErrorMessages(nameError, usernameError, pwError, document.getElementById('pw_confirm_error'), emailError, error) : deleteErrorMessages(nameError, usernameError, pwError, emailError, error)
+    document.getElementById('pw_confirm') ? deleteBorders(name, username, pw, pw_confirm, email) : deleteBorders(name, username, pw, email)
+
+    // --------------------------------------------------Front-end Validation (other validation functions in public -> front-end-js file)---------------------------------------------------------------------
+    let errorObject = {}
+    if (document.getElementById('pw_confirm')) {
+      errorObject = validateForm({ name: name.value, username: username.value, pw: pw.value, pw_confirm: pw_confirm.value, email: email.value })
+    } else {
+      errorObject = validateForm({ name: name.value, username: username.value, pw: pw.value, email: email.value })
+    }
+
+
+    if (Object.keys(errorObject).length) {
+      if (document.getElementById('pw_confirm')) createErrorView(errorObject, fields, errorMessageContainer, pw, pw_confirm)
+      else createErrorView(errorObject, fields, errorMessageContainer)
+      return
+    }
+
+    //---------------------------------------------------Fetch to back-end -------------------------------------------------------------------------------------
+
+    const data = document.getElementById('pw_confirm') ? { name: name.value, username: username.value, pw: pw.value, pw_confirm: pw_confirm.value, email: email.value, authority: authority.value } : { name: name.value, username: username.value, pw: pw.value, email: email.value, authority: authority.value }
+    
+    
+    if (document.getElementById('pw_confirm')) {
+      fetch(`${url}/registerNewUser`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name.value, username: username.value, pw: pw.value, pw_confirm: pw_confirm.value, email: email.value, authority: authority.value })
+      })
+        .then(res => res.json())
+        .then(res => {
+          if (!Object.keys(res).length) {
+            success.innerText = 'User successfully created!'
+            resetFields(name, username, pw, pw_confirm, email)
+            setTimeout(() => success.innerText = '', 2000)
+          } else {
+            createErrorView(res, fields, errorMessageContainer, pw, pw_confirm)
+          }
+        })
+        .catch(res => {
+          error.innerText = `The server is down, please try again later`
+        })
+    } else {
+      console.log(id)
+       fetch(`${url}/editUser/${id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name.value, username: username.value, pw: pw.value, email: email.value, authority: authority.value })
+      })
+        .then(res => res.json())
+        .then(res => {
+          if (!Object.keys(res).length) {
+            success.innerText = 'Userdetails successfully updated!'
+            setTimeout(() => success.innerText = '', 2000)
+          } else {
+            createErrorView(res, fields, errorMessageContainer)
+          }
+        })
+        .catch(res => {
+          error.innerText = `The server is down, please try again later`
+        })
+    }
+
+  }
+
+  //---------------------------------------------------These functions creates and deletes the errorous part of the form---------------------------------------------------
+
+  const resetFields = (...formFields) => [...formFields].forEach(field => field.value = '')
+
+  const deleteErrorMessages = (...errorContainers) => [...errorContainers].forEach(container => container.innerText = '')
+
+  const deleteBorders = (...formFields) => [...formFields].forEach(field => field.setAttribute('class', 'w-50 form-control'))
+
+  const createErrorView = (errorObject, fields, errorMessageContainer, pw, pw_confirm) => {
+    for (let [key, value] of Object.entries(errorObject)) {
+      if (fields.hasOwnProperty(key)) fields[key].setAttribute('class', 'form-control border border-3 border-danger w-50')
+      if (errorMessageContainer.hasOwnProperty(key)) errorMessageContainer[key].innerText = value
+      // this is a special error - it highlights the 2 password fields
+      if (pw_confirm && key === 'pw_error') {
+        pw.setAttribute('class', 'form-control border border-3 border-danger w-50')
+        pw_confirm.setAttribute('class', 'form-control border border-3 border-danger w-50')
+        error.innerText = value
+      }
+
+    }
+  }
+
+
+
+
+  // --------------------------------------------------------------------End--------------------------------------------------------------------
+
+</script>

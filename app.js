@@ -77,8 +77,10 @@ if (selectedDb === 'mongodb') {
     app.post('/selectTheme', authMiddleware, adminController.setTheme.bind(adminController))
     app.post('/installTheme', authMiddleware, adminController.installTheme.bind(adminController))
     app.get('/accounts', authMiddleware, adminController.findAccounts.bind(adminController))
-    app.get('/createAccount',  adminController.newAccount.bind(adminController))
-    app.post('/registerNewUser',  adminController.createNewAccount.bind(adminController))
+    app.get('/account', authMiddleware, adminController.account.bind(adminController))
+    app.get('/account/:id', authMiddleware, adminController.account.bind(adminController))
+    app.post('/registerNewUser', authMiddleware, adminController.createNewAccount.bind(adminController))
+    app.post('/editUser/:id', authMiddleware, adminController.editAccount.bind(adminController))
 
     app.get('/logout', authMiddleware, loginController.logout)
 

@@ -201,20 +201,40 @@ module.exports = class AdminController {
       })
     }
 
-    newAccount(req, res) {
-      res.render('register-account', {
+    async account(req, res) {
+      const { id } = req.params;
+      
+      let user = null
+
+      if (id) {
+        try {
+          user = await this.userService.findUserById(id)
+        } catch (error) {
+          console.log(error)
+        }
+      }
+      
+      res.render('account', {
         layout: 'main',
+        user,
         css: this.getTheme()
       })
     }
 
     async createNewAccount(req, res) {
       const { name, username, pw, pw_confirm, email, authority } = req.body;
-
       const errorObject = validateForm({ name, username, pw, pw_confirm, email, authority })
       
       if (!Object.keys(errorObject).length) {
         try {
+          const isUsernameOrEmailExists = await this.userService.checkIfUsernameOrEmailExist(username, email)
+
+          if (isUsernameOrEmailExists) {
+            let errorString = ''
+            errorString = username === isUsernameOrEmailExists.username ? 'This username is used by someone else, please change it' : 'This email is used by someone else, please change it'
+            res.json({error: errorString})
+            return
+          }
           await this.userService.registerUser({ name, username, pw, email, authority })
           res.json({})
           return
@@ -224,6 +244,34 @@ module.exports = class AdminController {
       } else {
         res.json(errorObject)
       }
+    }
+
+
+    async editAccount(req, res) {
+      const { id } = req.params;
+      const { name, username, pw, email, authority } = req.body;
+
+      const errorObject = validateForm({ name, username, pw, email, authority })
+      
+      if (!Object.keys(errorObject).length) {
+        try {
+          const isNewUsernameOrEmailExists = await this.userService.isNewUsernameOrEmailExists(username, email, id)
+          if (isNewUsernameOrEmailExists) {
+            let errorString = ''
+            errorString = username === isNewUsernameOrEmailExists.username ? 'This username is used by someone else, please change it' : 'This email is used by someone else, please change it'
+            res.json({error: errorString})
+            return
+          }
+          await this.userService.editUserData({ id, name, username, pw, email, authority })
+          res.json({})
+          return
+        } catch (error) {
+          res.json({error: 'We are sorry, but something went wrong, please try again later'})
+        }
+      } else {
+        res.json(errorObject)
+      }
+
     }
 
 

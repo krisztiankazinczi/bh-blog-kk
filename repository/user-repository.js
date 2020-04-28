@@ -67,10 +67,97 @@ module.exports = class UserRepository {
     try {
       const lastID = await this.db.run(insertNewUser, [newUser.name, newUser.username, newUser.password, newUser.email, newUser.isAdmin, newUser.isSuperAdmin]);
       return lastID;
-      return true
     } catch (error) {
       console.error(error);
     } 
+  }
+
+
+  async checkIfUsernameOrEmailExist(username, email) {
+    const IsEmailOrUsernameExists = `SELECT
+                                       username,
+                                       email
+                                     FROM
+                                       users
+                                     WHERE
+                                       username = ?
+                                     OR
+                                       email = ?`
+
+      try {
+        const isItExists = this.db.get(IsEmailOrUsernameExists, [username, email])
+        return isItExists
+      } catch (error) {
+        return error
+      }
+  }
+
+
+  async findUserById(id) {
+    const findUserById = `SELECT
+                            id,
+                            name,
+                            username, 
+                            password, 
+                            email, 
+                            isAdmin, 
+                            isSuperAdmin 
+                          FROM 
+                            users 
+                          WHERE 
+                            ID = ?`;
+
+    try {
+      let userDetails = await this.db.get(findUserById, [id]);
+      if (userDetails) userDetails = new NewUser(userDetails.id, userDetails.name, userDetails.username, userDetails.password, userDetails.email, userDetails.isAdmin, userDetails.isSuperAdmin)
+      return userDetails;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async editUserData(editedUser) {
+    const updateUserData = `UPDATE 
+                             users
+                            SET
+                              name = ?,
+                              username = ?, 
+                              password = ?, 
+                              email = ?, 
+                              isAdmin = ?, 
+                              isSuperAdmin = ?
+                            WHERE
+                              id = ?`
+
+    try {
+      await this.db.run(updateUserData, [editedUser.name, editedUser.username, editedUser.password, editedUser.email, editedUser.isAdmin, editedUser.isSuperAdmin, editedUser.id]);
+      return
+    } catch (error) {
+      console.error(error);
+    } 
+  }
+
+  async isNewUsernameOrEmailExists(username, email, id) {
+    const IsEmailOrUsernameExists = `SELECT
+                                       username,
+                                       email
+                                     FROM
+                                       users
+                                     WHERE
+                                       (
+                                          username = ?
+                                        OR
+                                          email = ?
+                                       )
+                                     AND
+                                       id != ?`
+
+      try {
+        const isItExists = this.db.get(IsEmailOrUsernameExists, [username, email, id])
+        return isItExists
+      } catch (error) {
+        return error
+      }
   }
 
 
