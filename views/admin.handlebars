@@ -12,10 +12,12 @@
                       <div class="col-6 text-center">
                           <a href="http://localhost:3000/newPost">Create New Post</a><br>
                           <a href="http://localhost:3000/adminPostList">Post List</a><br>
+                          {{#if isAdmin}}
                           <a href="http://localhost:3000/setDatabase">Select Database to use</a><br>
                           <a href="http://localhost:3000/selectTheme">Select Theme</a><br>
                           <a href="http://localhost:3000/accounts">Accounts</a><br>
                           <a href="http://localhost:3000/account">Create new Account</a><br>
+                          {{/if}}
                       </div>
                       <div class="col-3"></div>
                   </div>

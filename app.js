@@ -12,6 +12,7 @@ const UserService = require('./service/user-service')
 const ThemeService = require('./service/theme-service')
 
 const authMiddleware = require('./middlewares/authMiddleware')
+const isAdminMiddleware = require('./middlewares/is-admin-middleware')
 
 const app = express();
 const port = 3000;
@@ -70,17 +71,17 @@ if (selectedDb === 'mongodb') {
     app.get('/adminPostList', authMiddleware, adminController.getPosts.bind(adminController));
     app.get('/editPost/:id', authMiddleware, adminController.getPost.bind(adminController));
     app.post('/updatePost/:id', authMiddleware, adminController.updatePost.bind(adminController));
-    app.get('/setDatabase', authMiddleware, adminController.getDBSettings.bind(adminController))
-    app.post('/selectDatabase', authMiddleware, adminController.setDB)
-    app.post('/configureMongoDB', authMiddleware, adminController.configureMongoDB)
-    app.get('/selectTheme', authMiddleware, adminController.findThemes.bind(adminController))
-    app.post('/selectTheme', authMiddleware, adminController.setTheme.bind(adminController))
-    app.post('/installTheme', authMiddleware, adminController.installTheme.bind(adminController))
-    app.get('/accounts', authMiddleware, adminController.findAccounts.bind(adminController))
-    app.get('/account', authMiddleware, adminController.account.bind(adminController))
-    app.get('/account/:id', authMiddleware, adminController.account.bind(adminController))
-    app.post('/registerNewUser', authMiddleware, adminController.createNewAccount.bind(adminController))
-    app.post('/editUser/:id', authMiddleware, adminController.editAccount.bind(adminController))
+    app.get('/setDatabase', authMiddleware, isAdminMiddleware, adminController.getDBSettings.bind(adminController))
+    app.post('/selectDatabase', authMiddleware, isAdminMiddleware, adminController.setDB)
+    app.post('/configureMongoDB', authMiddleware, isAdminMiddleware, adminController.configureMongoDB)
+    app.get('/selectTheme', authMiddleware, isAdminMiddleware, adminController.findThemes.bind(adminController))
+    app.post('/selectTheme', authMiddleware, isAdminMiddleware, adminController.setTheme.bind(adminController))
+    app.post('/installTheme', authMiddleware, isAdminMiddleware, adminController.installTheme.bind(adminController))
+    app.get('/accounts', authMiddleware, isAdminMiddleware, adminController.findAccounts.bind(adminController))
+    app.get('/account', authMiddleware, isAdminMiddleware, adminController.account.bind(adminController))
+    app.get('/account/:id', authMiddleware, isAdminMiddleware, adminController.account.bind(adminController))
+    app.post('/registerNewUser', authMiddleware, isAdminMiddleware, adminController.createNewAccount.bind(adminController))
+    app.post('/editUser/:id', authMiddleware, isAdminMiddleware, adminController.editAccount.bind(adminController))
 
     app.get('/logout', authMiddleware, loginController.logout)
 

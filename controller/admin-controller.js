@@ -28,7 +28,14 @@ module.exports = class AdminController {
     }
 
     getDashboard(req, res) {
-        res.render('admin', { layout: 'main', css: this.getTheme() })
+      // I want that the authors see only a few part of the admin page. In the render I will determine what options can be seen depends on the authority of the user
+      let isAdmin = 0;
+      if (req.session.user.isAdmin === 1) isAdmin = 1
+        res.render('admin', {
+          layout: 'main',
+          css: this.getTheme(),
+          isAdmin
+        })
     }
 
     async getPosts(req, res) {

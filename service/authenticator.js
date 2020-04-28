@@ -32,7 +32,6 @@ module.exports = class Authenticator {
     }
 
     deleteSession(sessionId) {
-      console.log('nem jut be ide')
         const idx = sessions.findIndex(session => session.id === sessionId);
         if (idx !== -1){
             sessions.splice(idx, 1)
