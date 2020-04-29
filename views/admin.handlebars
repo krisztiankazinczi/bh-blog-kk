@@ -1,27 +1,27 @@
+<div class="col-12">
+  <div class="text-right">
+    <a href="http://localhost:3000/logout">Logout</a>
+  </div>
 
-    
-    <div class="col-12">
-        <div class="text-right">
-            <a href="http://localhost:3000/logout">Logout</a>
+  <div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="container">
+      <div class="row">
+        <div class="col-3"></div>
+        <div class="col-6 text-center">
+            <a href="http://localhost:3000/newPost">Create New Post</a><br>
+            <a href="http://localhost:3000/adminPostList">Post List</a><br>
+          {{#if isAdmin}}
+            <a href="http://localhost:3000/accounts">Accounts</a><br>
+            <a href="http://localhost:3000/account">Create new Account</a><br>
+          {{/if}}
+          {{#if isSuperAdmin}}
+            <a href="http://localhost:3000/setDatabase">Select Database to use</a><br>
+            <a href="http://localhost:3000/selectTheme">Select Theme</a><br>
+          {{/if}}
         </div>
-        
-          <div class="d-flex justify-content-center align-items-center vh-100" >
-              <div class="container">
-                  <div class="row">
-                      <div class="col-3"></div>
-                      <div class="col-6 text-center">
-                          <a href="http://localhost:3000/newPost">Create New Post</a><br>
-                          <a href="http://localhost:3000/adminPostList">Post List</a><br>
-                          {{#if isAdmin}}
-                          <a href="http://localhost:3000/setDatabase">Select Database to use</a><br>
-                          <a href="http://localhost:3000/selectTheme">Select Theme</a><br>
-                          <a href="http://localhost:3000/accounts">Accounts</a><br>
-                          <a href="http://localhost:3000/account">Create new Account</a><br>
-                          {{/if}}
-                      </div>
-                      <div class="col-3"></div>
-                  </div>
-                  
-            </div>
-        </div>
+        <div class="col-3"></div>
+      </div>
+
     </div>
+  </div>
+</div>
