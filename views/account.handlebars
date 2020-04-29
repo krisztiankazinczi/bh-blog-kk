@@ -80,6 +80,7 @@
             <select name="authority" id="authority">
               <option value="author" {{#unless user.isAdmin}}selected{{/unless}}>Author</option>
               <option value="admin" {{#if user.isAdmin}}selected{{/if}}>Admin</option>
+              {{#if superAdmin}}<option value="superAdmin" {{#if user.isSuperAdmin}}selected{{/if}}>SuperAdmin</option>{{/if}}
             </select>
           </div>
         </div>

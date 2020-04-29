@@ -1,7 +1,5 @@
 const Authenticator = require('../service/authenticator');
 
-const nodemailer = require('nodemailer');
-
 const AUTH_COOKIE = 'ssid';
 
 module.exports = class LoginController {
@@ -125,7 +123,7 @@ module.exports = class LoginController {
     })
 
   }
-
+  
   async changePassword(req, res) {
     const { password, password_confirm, email, token } = req.body;
 

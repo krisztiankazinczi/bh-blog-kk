@@ -17,6 +17,7 @@ const EmailService = require('./service/email-service')
 
 const authMiddleware = require('./middlewares/authMiddleware')
 const isAdminMiddleware = require('./middlewares/is-admin-middleware')
+const isSuperAdminMiddleware = require('./middlewares/is-super-admin-middleware')
 
 const app = express();
 const port = 3000;
@@ -79,12 +80,12 @@ if (selectedDb === 'mongodb') {
     app.get('/adminPostList', authMiddleware, adminController.getPosts.bind(adminController));
     app.get('/editPost/:id', authMiddleware, adminController.getPost.bind(adminController));
     app.post('/updatePost/:id', authMiddleware, adminController.updatePost.bind(adminController));
-    app.get('/setDatabase', authMiddleware, isAdminMiddleware, adminController.getDBSettings.bind(adminController))
-    app.post('/selectDatabase', authMiddleware, isAdminMiddleware, adminController.setDB)
-    app.post('/configureMongoDB', authMiddleware, isAdminMiddleware, adminController.configureMongoDB)
-    app.get('/selectTheme', authMiddleware, isAdminMiddleware, adminController.findThemes.bind(adminController))
-    app.post('/selectTheme', authMiddleware, isAdminMiddleware, adminController.setTheme.bind(adminController))
-    app.post('/installTheme', authMiddleware, isAdminMiddleware, adminController.installTheme.bind(adminController))
+    app.get('/setDatabase', authMiddleware, isAdminMiddleware, isSuperAdminMiddleware, adminController.getDBSettings.bind(adminController))
+    app.post('/selectDatabase', authMiddleware, isAdminMiddleware, isSuperAdminMiddleware, adminController.setDB)
+    app.post('/configureMongoDB', authMiddleware, isAdminMiddleware, isSuperAdminMiddleware, adminController.configureMongoDB)
+    app.get('/selectTheme', authMiddleware, isAdminMiddleware, isSuperAdminMiddleware, adminController.findThemes.bind(adminController))
+    app.post('/selectTheme', authMiddleware, isAdminMiddleware, isSuperAdminMiddleware, adminController.setTheme.bind(adminController))
+    app.post('/installTheme', authMiddleware, isAdminMiddleware, isSuperAdminMiddleware, adminController.installTheme.bind(adminController))
     app.get('/accounts', authMiddleware, isAdminMiddleware, adminController.findAccounts.bind(adminController))
     app.get('/account', authMiddleware, isAdminMiddleware, adminController.account.bind(adminController))
     app.get('/account/:id', authMiddleware, isAdminMiddleware, adminController.account.bind(adminController))

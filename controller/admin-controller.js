@@ -220,10 +220,10 @@ module.exports = class AdminController {
           console.log(error)
         }
       }
-      
       res.render('account', {
         layout: 'main',
         user,
+        superAdmin: req.session.user.isSuperAdmin, // only superAdmins can nominate someone to superAdmin, other won't see this option in the dropdown
         css: this.getTheme()
       })
     }

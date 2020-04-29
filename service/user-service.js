@@ -53,7 +53,7 @@ module.exports = class LoginService {
 
   async editUserData(userData) {
     try {
-      const editedUser = new NewUser(userData.id, userData.name, userData.username, userData.pw, userData.email, userData.authority === 'admin' ? 1 : 0, userData.authority === 'superAdmin' ? 1 : 0)
+      const editedUser = new NewUser(userData.id, userData.name, userData.username, userData.pw, userData.email, userData.authority === 'superAdmin' ? 1 : userData.authority === 'admin' ? 1 : 0, userData.authority === 'superAdmin' ? 1 : 0)
       await this.userRepository.editUserData(editedUser)
     } catch (error) {
       return error
