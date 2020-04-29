@@ -161,5 +161,21 @@ module.exports = class UserRepository {
   }
 
 
+  async changePassword(password, email) {
+    const changePassword = `UPDATE
+                              users
+                            SET
+                              password = ?
+                            WHERE
+                              email = ?`
+
+      try {
+        await this.db.run(changePassword, [password, email])
+      } catch (error) {
+        return error
+      }
+  }
+
+
 
 }

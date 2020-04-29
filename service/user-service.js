@@ -69,4 +69,12 @@ module.exports = class LoginService {
     }
   }
 
+  async changePassword(password, email) {
+    try {
+      await this.userRepository.changePassword(password, email)
+    } catch (error) {
+      return error
+    }
+  }
+
 }

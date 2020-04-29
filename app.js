@@ -11,6 +11,10 @@ const UserService = require('./service/user-service')
 
 const ThemeService = require('./service/theme-service')
 
+const ResetPwTokenService = require('./service/reset-pw-token-service')
+
+const EmailService = require('./service/email-service')
+
 const authMiddleware = require('./middlewares/authMiddleware')
 const isAdminMiddleware = require('./middlewares/is-admin-middleware')
 
@@ -46,7 +50,7 @@ if (selectedDb === 'mongodb') {
     const UserRepository = require('./repository/user-repository')
     const Authenticator = require('./service/authenticator');
 
-    loginController = new LoginController( new ThemeService(), new Authenticator( new UserRepository( new DB() ) ) );
+    loginController = new LoginController( new ThemeService(), new Authenticator( new UserRepository( new DB() ) ), new ResetPwTokenService(), new UserService( new UserRepository( new DB() ) ), new EmailService() );
     blogController = new BlogController( new BlogPostService( new PostRepository( new DB() ) ), new ThemeService() );
     adminController = new AdminController( new BlogPostService( new PostRepository( new DB() ) ), new ThemeService(), new UserService( new UserRepository( new DB() ) ) );
 } else {
@@ -66,6 +70,10 @@ if (selectedDb === 'mongodb') {
 
     app.get('/login', loginController.get.bind(loginController));
     app.post('/login', loginController.post.bind(loginController));
+    app.get('/forgot', loginController.forgotPw.bind(loginController))
+    app.post('/forgot', loginController.resetPwEmail.bind(loginController))
+    app.get('/forgot/change', loginController.changePwPage.bind(loginController))
+    app.post('/forgot/change', loginController.changePassword.bind(loginController))
 
     app.get('/admin', authMiddleware, adminController.getDashboard.bind(adminController));
     app.get('/adminPostList', authMiddleware, adminController.getPosts.bind(adminController));
