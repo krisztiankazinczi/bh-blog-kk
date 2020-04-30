@@ -22,6 +22,7 @@
             </thead>
             <tbody>
                 {{#each posts}}
+                {{#if this.authorized}}
                 <div class="row">
                     <tr>
                         <div class="col-3">
@@ -40,6 +41,7 @@
                         </div>
                     </tr>
                 </div>
+                {{/if}}
                 {{/each}}
             </tbody>
         </table>

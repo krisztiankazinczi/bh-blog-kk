@@ -19,6 +19,8 @@ const authMiddleware = require('./middlewares/authMiddleware')
 const isAdminMiddleware = require('./middlewares/is-admin-middleware')
 const isSuperAdminMiddleware = require('./middlewares/is-super-admin-middleware')
 
+const Authenticator = require('./service/authenticator')
+
 const app = express();
 const port = 3000;
 
@@ -52,7 +54,7 @@ if (selectedDb === 'mongodb') {
     const Authenticator = require('./service/authenticator');
 
     loginController = new LoginController( new ThemeService(), new Authenticator( new UserRepository( new DB() ) ), new ResetPwTokenService(), new UserService( new UserRepository( new DB() ) ), new EmailService() );
-    blogController = new BlogController( new BlogPostService( new PostRepository( new DB() ) ), new ThemeService() );
+    blogController = new BlogController( new BlogPostService( new PostRepository( new DB() ) ), new ThemeService(), new Authenticator() );
     adminController = new AdminController( new BlogPostService( new PostRepository( new DB() ) ), new ThemeService(), new UserService( new UserRepository( new DB() ) ) );
 } else {
     console.log('there must be a mistake in the config file, because we have no db like this')

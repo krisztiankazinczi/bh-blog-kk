@@ -59,7 +59,7 @@
           <div class="col-7">
             <div class="row">
               <div class="col-3 text-center">
-                <a href="http://localhost:3000/admin"><input class="btn btn-info text-white w-75" value="Discard"></a>
+                <button type="button" class="btn btn-danger" onclick="confirm()">Discard</button>
               </div>
               <div class="col-4 text-center">
                 <input id="save-draft" class="btn btn-info text-white w-75" value="Save as draft">
@@ -93,7 +93,56 @@
 
 
 
+{{!-- Modal --}}
+    <div class="modal fade" id="discard-changes" tabindex="-1" role="dialog" aria-labelledby="discard" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Discard changes</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="modal-body">
+          <div class="container">
+              <div class="row mt-4">
+                  <h4>Please note if you click on Discard button you will lose all your changes. Please be sure that you saved it as draft!</h4>
+                  <input type="hidden" id="del-id" name="id" value="" />
+              </div>
+              <div class="row mt-5">
+                  <div class="col-2">
+                      <a href="http://localhost:3000/admin"><button type="button" class="btn btn-danger">Discard</button></a>
+                  </div>
+                  <div class="col-8">
+
+                  </div>
+                  <div class="col-2">
+                      <button type="button" class="btn btn-info" onclick="cancel()">Cancel</button>
+                  </div>
+              </div>
+          </div>
+        
+          
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
 <script>
+
+  function confirm() {
+    $('#discard-changes').modal();
+  }
+
+  function cancel() {
+        $('#discard-changes').modal('hide');
+    }
 
   const form = document.getElementById('create-new-post');
   const errorMessageToUser = document.getElementById('error-message-to-user');

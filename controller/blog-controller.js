@@ -1,13 +1,14 @@
 const NewPost = require('../utils/NewPost');
-const authenticator = require('../service/authenticator');
+// const authenticator = require('../service/authenticator');
 const { validateNewPost } = require('./validation/new-post-validation');
 
 const slugify = require('slugify')
 
 module.exports = class BlogController {
-    constructor(blogPostService, themeService) {
+    constructor(blogPostService, themeService, authenticator) {
         this.blogPostService = blogPostService;
         this.themeService = themeService
+        this.authenticator = authenticator
     }
 
     async get(req, res) {
@@ -52,7 +53,7 @@ module.exports = class BlogController {
       //if there is no tag selected, the findBYId function wont work, since it's an inner join with tags_in_post table
         const { title, content, tags } = req.body;
         let  { slug } = req.body;
-        const author = authenticator.findUserBySession(req.cookies.ssid).username;
+        const author = this.authenticator.findUserBySession(req.cookies.ssid).username;
         const validateForm = validateNewPost(title, slug, content)
 
         if (validateForm) res.redirect(`/newPost?error=${validateForm[0]}&titleVal=${validateForm[1]}&slugVal=${validateForm[2]}&contentVal=${validateForm[3]}`);
@@ -69,7 +70,7 @@ module.exports = class BlogController {
     async draft(req, res) {
       //if there is no tag selected, the findBYId function wont work, since it's an inner join with tags_in_post table
         const { title, slug, content, tags } = req.body;
-        const author = authenticator.findUserBySession(req.cookies.ssid).username;
+        const author = this.authenticator.findUserBySession(req.cookies.ssid).username;
         const newPost = new NewPost(undefined, title, slug, author, new Date().toLocaleString().split(',')[0], null, content, true, tags)
         await this.blogPostService.createDraft(newPost);
         res.redirect('/adminPostList');

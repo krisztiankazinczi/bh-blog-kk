@@ -28,6 +28,7 @@ module.exports = class AdminController {
     }
 
     getDashboard(req, res) {
+      const { authorization } = req.query;
       // I want that the authors see only a few part of the admin page. In the render I will determine what options can be seen depends on the authority of the user
       let isAdmin = 0;
       let isSuperAdmin = 0
@@ -37,16 +38,21 @@ module.exports = class AdminController {
           layout: 'main',
           css: this.getTheme(),
           isAdmin,
-          isSuperAdmin
+          isSuperAdmin,
+          authorization
         })
     }
 
     async getPosts(req, res) {
+      let posts = await this.blogPostService.findAllPosts();
+      // everyone can see only their own posts or admins can see everyones posts
+      const { username, isAdmin } = req.session.user
+      posts = posts.map(post => post.author === username || isAdmin === 1 ? {...post, authorized: true} : {...post, authorizited: false})
 
         res.render('admin-post-list', {
             layout: 'blog',
             title: 'Blog Title',
-            posts: await this.blogPostService.findAllPosts(),
+            posts,
             archive: await this.blogPostService.createArchive(),
             tags: await this.blogPostService.findTags(),
             css: this.getTheme()
@@ -56,9 +62,13 @@ module.exports = class AdminController {
     async getPost(req, res) {
         const id = req.params.id;
         const post = await this.blogPostService.findPostById(id);
+        // I won\t let anyone to edit someone else's posts if just type the correct url in browser
+        if(req.session.user.username !== post.author && req.session.user.isAdmin !== 1) {
+          res.redirect('/admin?authorization=true')
+          return
+        }
         let tags = await this.blogPostService.findTags();
         tags = findSelectedTags(post.tags, tags)
-        console.log(post, tags)
         res.render('admin-edit-post', {
             layout: 'blog',
             title: post.title,
@@ -74,7 +84,7 @@ module.exports = class AdminController {
         const id = req.params.id;
         const { title, content, draft, tags } = req.body;
         let { slug } = req.body;
-        const author = authenticator.findUserBySession(req.cookies.ssid).username;
+        const author = req.session.user.username 
         const correctSlug = checkSlugCorrectness(slug)
         if (!correctSlug && title) slug = slugify(title)
         if (!slug.includes('-') && slug.length > 0) slug += '-'

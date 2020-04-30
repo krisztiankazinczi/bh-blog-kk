@@ -40,7 +40,7 @@ module.exports = class PostRepository {
         group_concat(tags_in_post.tag_id) as tags
       FROM
         tags_in_post
-      RIGHT JOIN
+      LEFT JOIN
         posts ON posts.id = tags_in_post.post_id
       WHERE
         posts.id = ?`
@@ -48,7 +48,6 @@ module.exports = class PostRepository {
     try {
       let post = await this.db.get(sqlGetPostById, [id]);
       post = new NewPost(post.id, post.title, post.slug, post.author, post.last_modified_at, post.published_at, post.content, post.draft, post.tags ? post.tags.split(',') : post.tags)
-      console.log(post)
       return post;
     } catch (error) {
       console.error(error);
