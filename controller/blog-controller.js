@@ -41,7 +41,7 @@ module.exports = class BlogController {
         const error = createErrorObjectForAddPost(req.query);
 
         res.render('add-new-post', {
-            layout: 'main',
+            layout: 'summernote',
             error,
             tags: await this.blogPostService.findTags(),
             css: this.themeService.createThemePath()
@@ -53,6 +53,7 @@ module.exports = class BlogController {
       //if there is no tag selected, the findBYId function wont work, since it's an inner join with tags_in_post table
         const { title, content, tags } = req.body;
         let  { slug } = req.body;
+        console.log(title, content, tags, slug)
         const author = this.authenticator.findUserBySession(req.cookies.ssid).username;
         const validateForm = validateNewPost(title, slug, content)
 
@@ -68,7 +69,6 @@ module.exports = class BlogController {
     }
 
     async draft(req, res) {
-      //if there is no tag selected, the findBYId function wont work, since it's an inner join with tags_in_post table
         const { title, slug, content, tags } = req.body;
         const author = this.authenticator.findUserBySession(req.cookies.ssid).username;
         const newPost = new NewPost(undefined, title, slug, author, new Date().toLocaleString().split(',')[0], null, content, true, tags)

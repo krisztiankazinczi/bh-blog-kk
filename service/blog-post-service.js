@@ -16,6 +16,10 @@ class BlogPostService {
         return this.postRepository.findPostById(id);
     }
 
+    findAuthorOfPostById(id) {
+      return this.postRepository.findAuthorOfPostById(id)
+    }
+
     findPostBySlug(slug) {
         return this.postRepository.findPostBySlug(slug);
     }

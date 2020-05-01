@@ -70,7 +70,7 @@ module.exports = class AdminController {
         let tags = await this.blogPostService.findTags();
         tags = findSelectedTags(post.tags, tags)
         res.render('admin-edit-post', {
-            layout: 'blog',
+            layout: 'summernote',
             title: post.title,
             post,
             archive: await this.blogPostService.createArchive(),
@@ -84,7 +84,20 @@ module.exports = class AdminController {
         const id = req.params.id;
         const { title, content, draft, tags } = req.body;
         let { slug } = req.body;
-        const author = req.session.user.username 
+
+        //If an admin edit the post he/she won't become the author of the post!!!!
+        let author;
+        if (req.session.user.isAdmin === 1) {
+          try {
+            const postAuthor = await this.blogPostService.findAuthorOfPostById(id)
+            console.log(postAuthor)
+            author = postAuthor 
+          } catch (error) {
+            console.log(error)
+          }
+        } else author = req.session.user.username
+
+
         const correctSlug = checkSlugCorrectness(slug)
         if (!correctSlug && title) slug = slugify(title)
         if (!slug.includes('-') && slug.length > 0) slug += '-'

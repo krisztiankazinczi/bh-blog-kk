@@ -1,6 +1,6 @@
-<div class="col-12 bg-secondary">
+<div class="col-12">
   <div class="d-flex justify-content-center align-items-center vh-100">
-    <div class="container bg-secondary">
+    <div class="container">
 
 
       <div class="row">
@@ -130,6 +130,13 @@
 
 
 <script>
+
+
+  $(document).ready(function () {
+    $('#content').summernote({
+      height: 250
+    });
+  });
 
   function confirm() {
     $('#discard-changes').modal();

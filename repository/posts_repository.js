@@ -54,6 +54,22 @@ module.exports = class PostRepository {
     }
   }
 
+  async findAuthorOfPostById(id) {
+    const sqlFindAuthor = `SELECT
+                            author
+                          FROM
+                            posts
+                          WHERE
+                            id = ?`
+
+    try {
+      const author = await this.db.get(sqlFindAuthor, [id])
+      return author.author
+    } catch (error) {
+      return error
+    }
+  }
+
   async findPostBySlug(slug) {
     const sqlGetPostBySlug = 'SELECT id, title, slug, author, last_modified_at, published_at, content, draft FROM posts WHERE slug = ?'
     try {
