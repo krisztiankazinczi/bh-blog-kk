@@ -20,8 +20,8 @@ class BlogPostService {
       return this.postRepository.findAuthorOfPostById(id)
     }
 
-    findPostBySlug(slug) {
-        return this.postRepository.findPostBySlug(slug);
+    findPostBySlug(slug, isActive) {
+        return this.postRepository.findPostBySlug(slug, isActive);
     }
 
     createPost(newPost) {
@@ -50,6 +50,14 @@ class BlogPostService {
 
     async findPostsByTag(id) {
         return await this.postRepository.findPostsByTag(id)
+    }
+
+    findActiveSlug(id) {
+      return this.postRepository.findActiveSlug(id)
+    }
+
+    checkPublishedStatus(id) {
+      return this.postRepository.checkPublishedStatus(id)
     }
 
 

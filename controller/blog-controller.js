@@ -26,14 +26,20 @@ module.exports = class BlogController {
 
     async getPost(req, res) {
         const { idOrSlug } = req.params;
-        const post = (idOrSlug.includes('-')) ? await this.blogPostService.findPostBySlug(idOrSlug) : await this.blogPostService.findPostById(idOrSlug);
+        let post = (idOrSlug.includes('-')) ? await this.blogPostService.findPostBySlug(idOrSlug, 1) : await this.blogPostService.findPostById(idOrSlug);
+        // if slug have been changed since it was bookmarked, I will try to find the new slug and load that page
+        if (!post) post = await this.blogPostService.findPostBySlug(idOrSlug, 0)
+        if (post) await this.blogPostService.findPostById(post.id)
+        let error = false;
+        if (!post) error = true 
         res.render('read-post-view', {
             layout: 'blog',
-            title: post.title,
+            // title: post.title,
             post,
             archive: await this.blogPostService.createArchive(),
             tags: await this.blogPostService.findTags(),
-            css: this.themeService.createThemePath()
+            css: this.themeService.createThemePath(),
+            error
         })
     }
 
@@ -51,10 +57,14 @@ module.exports = class BlogController {
 
     async post(req, res) {
       //if there is no tag selected, the findBYId function wont work, since it's an inner join with tags_in_post table
-        const { title, content, tags } = req.body;
-        let  { slug } = req.body;
-        console.log(title, content, tags, slug)
+        const { title, content } = req.body;
+
+        let  { slug, tags} = req.body;
+
+        if (typeof tags === 'string') tags = [tags]
+
         const author = this.authenticator.findUserBySession(req.cookies.ssid).username;
+
         const validateForm = validateNewPost(title, slug, content)
 
         if (validateForm) res.redirect(`/newPost?error=${validateForm[0]}&titleVal=${validateForm[1]}&slugVal=${validateForm[2]}&contentVal=${validateForm[3]}`);
@@ -62,16 +72,20 @@ module.exports = class BlogController {
             const correctSlug = checkSlugCorrectness(slug)
             if (!correctSlug) slug = slugify(title)
             if (!slug.includes('-') && slug.length > 0) slug += '-' // I need this dash, because of getPost(idOrSlug) function needs a dash to identify if it's a slug or id
-            const newPost = new NewPost(undefined, title, slug, author, new Date().toLocaleString().split(',')[0], new Date(), content, false, tags)
+            const newPost = new NewPost(undefined, title, slug, author, new Date(), new Date(), content, 0, tags)
             await this.blogPostService.createPost(newPost);
             res.redirect('/postList')
         }
     }
 
     async draft(req, res) {
-        const { title, slug, content, tags } = req.body;
+        const { title, slug, content } = req.body;
+        let { tags } = req.body;
+
+        if (typeof tags === 'string') tags = [tags]
+
         const author = this.authenticator.findUserBySession(req.cookies.ssid).username;
-        const newPost = new NewPost(undefined, title, slug, author, new Date().toLocaleString().split(',')[0], null, content, true, tags)
+        const newPost = new NewPost(undefined, title, slug, author, new Date(), 0, content, 1, tags)
         await this.blogPostService.createDraft(newPost);
         res.redirect('/adminPostList');
     }

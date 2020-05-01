@@ -1,3 +1,4 @@
+{{#unless error}}
 <div class="container-fluid bg-secondary vh-100">
   <div class="container bg-secondary vh-100">
     
@@ -22,3 +23,16 @@
   </div>
 
 </div>
+{{/unless}}
+
+{{#if error}}
+<div class="container-fluid bg-secondary vh-100">
+  <div class="container bg-secondary vh-100">
+    
+    <div class="row rounded text-light bg-dark pt-2 pb-2">
+      <h3 class="text-danger">We are really sorry, but this url is not existing in our system</h3>
+    </div>
+  </div>
+
+</div>
+{{/if}}

@@ -1,5 +1,5 @@
 module.exports = class NewPost {
-    constructor(id, title, slug, author, last_modified_at, published_at, content, draft, tags) {
+    constructor(id, title, slug, author, last_modified_at, published_at, content, draft, tags, newActiveSlugNeeded) {
         this.id = id;
         this.title = title;
         this.slug = slug;
@@ -9,5 +9,6 @@ module.exports = class NewPost {
         this.content = content;
         this.draft = draft;
         this.tags = tags;
+        this.newActiveSlugNeeded = newActiveSlugNeeded
     }
 }

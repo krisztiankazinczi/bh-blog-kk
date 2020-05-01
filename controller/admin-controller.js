@@ -82,27 +82,60 @@ module.exports = class AdminController {
     async updatePost(req, res) {
       //if there is no tag selected, the findBYId function wont work, since it's an inner join with tags_in_post table
         const id = req.params.id;
-        const { title, content, draft, tags } = req.body;
-        let { slug } = req.body;
+        const { title, content, draft } = req.body;
+        let { slug, tags } = req.body;
 
-        //If an admin edit the post he/she won't become the author of the post!!!!
+        //if there is only 1 selecterd tag, then I change it to an array => in repository I don\t have to check many possibilities in insert into tags_in_post
+
+        if (typeof tags === 'string') tags = [tags]
+
+        //If an admin edits the post he/she won't become the author of the post!!!!
         let author;
         if (req.session.user.isAdmin === 1) {
           try {
             const postAuthor = await this.blogPostService.findAuthorOfPostById(id)
-            console.log(postAuthor)
             author = postAuthor 
           } catch (error) {
             console.log(error)
           }
         } else author = req.session.user.username
 
+        // create the necessary slug format if needed
 
         const correctSlug = checkSlugCorrectness(slug)
         if (!correctSlug && title) slug = slugify(title)
         if (!slug.includes('-') && slug.length > 0) slug += '-'
 
-        const updatedPost = (draft) ? new NewPost(id, title, slug, author, new Date().toLocaleString().split(',')[0], null, content, true, tags) : new NewPost(id, title, slug, author, new Date().toLocaleString().split(',')[0], new Date(), content, false, tags)
+        // Check if the slug changed or is it exists at all?
+
+        let activeSlugInDb = '';
+        let isNewActiveSlugNeeded = 0
+
+        try {
+          activeSlugInDb = await this.blogPostService.findActiveSlug(id)
+          if (!activeSlugInDb || activeSlugInDb !== slug) isNewActiveSlugNeeded = 1
+        } catch (error) {
+          console.log(error)
+        }
+
+        // Check if it was published earlier, because I would not like to change the original published date
+
+        let published_at = 0
+        try {
+          published_at = await this.blogPostService.checkPublishedStatus(id) // if it's not 0, then it was published out earlier
+        } catch (error) {
+          console.log(error)
+        }
+
+
+
+        const updatedPost = 
+          (draft) 
+          ? 
+          new NewPost(id, title, slug, author, new Date(), published_at, content, 1, tags, isNewActiveSlugNeeded)
+          : 
+          new NewPost(id, title, slug, author, new Date(), published_at == 0 ? new Date() : published_at, content, 0, tags, isNewActiveSlugNeeded);
+
         if (draft) await this.blogPostService.updatePostAsDraft(updatedPost, id)
         else await this.blogPostService.updatePost(updatedPost, id)
         res.redirect('/adminPostList')
