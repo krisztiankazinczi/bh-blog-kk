@@ -140,40 +140,130 @@
     //---------------------------------------------------This objectum literal form is needed for the validation functions----------------------------------
 
     let fields = { name, username, pw, email }
-    if (document.getElementById('pw_confirm')) fields = { ...fields, pw_confirm }
-    let errorMessageContainer = { name: nameError, username: usernameError, pw: pwError, email: emailError, error }
-    if (document.getElementById('pw_confirm')) errorMessageContainer = { ...errorMessageContainer, pw_confirm: document.getElementById('pw_confirm_error') }
+
+    if (document.getElementById('pw_confirm')) {
+      fields = { ...fields, pw_confirm }
+    } 
+
+    let errorMessageContainer = 
+      { 
+        name: nameError, 
+        username: usernameError, 
+        pw: pwError, 
+        email: emailError, 
+        error 
+      }
+    
+    if (document.getElementById('pw_confirm')) {
+      errorMessageContainer = { ...errorMessageContainer, pw_confirm: document.getElementById('pw_confirm_error') }
+    } 
 
     //---------------------------------------------------Delete the previous validation errors---------------------------------------------------
 
-    document.getElementById('pw_confirm') ? deleteErrorMessages(nameError, usernameError, pwError, document.getElementById('pw_confirm_error'), emailError, error) : deleteErrorMessages(nameError, usernameError, pwError, emailError, error)
-    document.getElementById('pw_confirm') ? deleteBorders(name, username, pw, pw_confirm, email) : deleteBorders(name, username, pw, email)
+    document.getElementById('pw_confirm') 
+      ? 
+        deleteErrorMessages(
+          nameError, 
+          usernameError, 
+          pwError, 
+          document.getElementById('pw_confirm_error'), 
+          emailError, 
+          error) 
+      : deleteErrorMessages(
+          nameError, 
+          usernameError, 
+          pwError, 
+          emailError, 
+          error)
+
+    document.getElementById('pw_confirm') 
+      ? 
+        deleteBorders(
+          name, 
+          username, 
+          pw, 
+          pw_confirm, 
+          email) 
+      : deleteBorders(
+        name, 
+        username, 
+        pw, 
+        email)
 
     // --------------------------------------------------Front-end Validation (other validation functions in public -> front-end-js file)---------------------------------------------------------------------
     let errorObject = {}
     if (document.getElementById('pw_confirm')) {
-      errorObject = validateForm({ name: name.value, username: username.value, pw: pw.value, pw_confirm: pw_confirm.value, email: email.value })
+      errorObject = validateForm({ 
+        name: name.value, 
+        username: username.value, 
+        pw: pw.value, 
+        pw_confirm: pw_confirm.value, 
+        email: email.value 
+      })
     } else {
-      errorObject = validateForm({ name: name.value, username: username.value, pw: pw.value, email: email.value })
+      errorObject = validateForm({ 
+        name: name.value, 
+        username: username.value, 
+        pw: pw.value, 
+        email: email.value 
+      })
     }
 
 
     if (Object.keys(errorObject).length) {
-      if (document.getElementById('pw_confirm')) createErrorView(errorObject, fields, errorMessageContainer, pw, pw_confirm)
-      else createErrorView(errorObject, fields, errorMessageContainer)
+      if (document.getElementById('pw_confirm')) {
+        createErrorView(
+          errorObject, 
+          fields, 
+          errorMessageContainer, 
+          pw, 
+          pw_confirm
+        )
+      } 
+      else {
+        createErrorView(
+          errorObject, 
+          fields, 
+          errorMessageContainer
+        )
+      } 
       return
     }
 
     //---------------------------------------------------Fetch to back-end -------------------------------------------------------------------------------------
 
-    const data = document.getElementById('pw_confirm') ? { name: name.value, username: username.value, pw: pw.value, pw_confirm: pw_confirm.value, email: email.value, authority: authority.value } : { name: name.value, username: username.value, pw: pw.value, email: email.value, authority: authority.value }
+    const data = document.getElementById('pw_confirm') 
+              ? 
+                { 
+                  name: name.value, 
+                  username: username.value, 
+                  pw: pw.value, 
+                  pw_confirm: pw_confirm.value, 
+                  email: email.value, 
+                  authority: authority.value 
+                } 
+              : 
+                { 
+                  name: name.value, 
+                  username: username.value, 
+                  pw: pw.value, 
+                  email: email.value, 
+                  authority: authority.value 
+                }
     
     
     if (document.getElementById('pw_confirm')) {
       fetch(`${url}/registerNewUser`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name.value, username: username.value, pw: pw.value, pw_confirm: pw_confirm.value, email: email.value, authority: authority.value })
+        body: JSON.stringify({ 
+          name: name.value, 
+          username: username.value, 
+          pw: pw.value, 
+          pw_confirm: pw_confirm.value, 
+          email: email.value, 
+          authority: authority.value 
+          })
       })
         .then(res => res.json())
         .then(res => {
@@ -193,7 +283,13 @@
        fetch(`${url}/editUser/${id}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name.value, username: username.value, pw: pw.value, email: email.value, authority: authority.value })
+        body: JSON.stringify({ 
+          name: name.value, 
+          username: username.value, 
+          pw: pw.value, 
+          email: email.value, 
+          authority: authority.value 
+          })
       })
         .then(res => res.json())
         .then(res => {
@@ -221,8 +317,13 @@
 
   const createErrorView = (errorObject, fields, errorMessageContainer, pw, pw_confirm) => {
     for (let [key, value] of Object.entries(errorObject)) {
-      if (fields.hasOwnProperty(key)) fields[key].setAttribute('class', 'form-control border border-3 border-danger w-50')
-      if (errorMessageContainer.hasOwnProperty(key)) errorMessageContainer[key].innerText = value
+      if (fields.hasOwnProperty(key)) {
+         fields[key].setAttribute('class', 'form-control border border-3 border-danger w-50')
+      }
+      if (errorMessageContainer.hasOwnProperty(key)) {
+        errorMessageContainer[key].innerText = value
+      } 
+
       // this is a special error - it highlights the 2 password fields
       if (pw_confirm && key === 'pw_error') {
         pw.setAttribute('class', 'form-control border border-3 border-danger w-50')

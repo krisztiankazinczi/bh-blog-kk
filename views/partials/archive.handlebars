@@ -1,8 +1,10 @@
+{{#if tree}}
 <div class="container bg-secondary text-white vh-100 overflow-auto">
     <div class="row">
         <div class="col-12">
             <h3 class="pt-2">Archive</h3><br>
             {{#each archive}}
+              {{#each this}}
                 <p class="bg-dark m-0 p-0">{{@key}}</p><br>
                 {{#each this }}
                     <p class="m-0 p-0">&nbsp;&nbsp;&nbsp;&nbsp;{{@key}}</p><br>
@@ -10,9 +12,41 @@
                             <p class="m-0 p-0">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="text-white" href="http://localhost:3000/post/{{this.id}}">{{this.title}}</a></p><br>
                         {{/each}}
                 {{/each}}
+                {{/each}}
             {{/each}}
         </div>
 
     </div>
 
 </div>
+{{/if}}
+
+{{#if list}}
+<div class="container bg-secondary text-white vh-100 overflow-auto">
+    <div class="row">
+        <div class="col-12">
+            <h3 class="pt-2">Archive</h3><br>
+            {{#each archive as | archive key | }}
+                {{#each this }}
+                    <p class="m-0 p-0"><a class="text-white" href="http://localhost:3000/post/{{this.id}}">{{key}}: <strong>{{this.title}}</strong></a></p><br>
+                {{/each}}
+            {{/each}}
+        </div>
+
+    </div>
+
+</div>
+{{/if}}
+
+{{#if styleError}}
+<div class="container bg-secondary text-white vh-100 overflow-auto">
+    <div class="row">
+        <div class="col-12">
+            <h3 class="pt-2">Archive</h3><br>
+            <p class="text-danger">We are really sorry, but there is an error in the archive system. Soon we will fix the issue</p>
+        </div>
+
+    </div>
+
+</div>
+{{/if}}

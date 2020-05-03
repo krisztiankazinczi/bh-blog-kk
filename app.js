@@ -15,11 +15,13 @@ const ResetPwTokenService = require('./service/reset-pw-token-service')
 
 const EmailService = require('./service/email-service')
 
+const archiveService = require('./service/archive-service')
+
+const timeFormatService = require('./service/time-format-service')
+
 const authMiddleware = require('./middlewares/authMiddleware')
 const isAdminMiddleware = require('./middlewares/is-admin-middleware')
 const isSuperAdminMiddleware = require('./middlewares/is-super-admin-middleware')
-
-const Authenticator = require('./service/authenticator')
 
 const app = express();
 const port = 3000;
@@ -54,8 +56,8 @@ if (selectedDb === 'mongodb') {
     const Authenticator = require('./service/authenticator');
 
     loginController = new LoginController( new ThemeService(), new Authenticator( new UserRepository( new DB() ) ), new ResetPwTokenService(), new UserService( new UserRepository( new DB() ) ), new EmailService() );
-    blogController = new BlogController( new BlogPostService( new PostRepository( new DB() ) ), new ThemeService(), new Authenticator() );
-    adminController = new AdminController( new BlogPostService( new PostRepository( new DB() ) ), new ThemeService(), new UserService( new UserRepository( new DB() ) ) );
+    blogController = new BlogController( new BlogPostService( new PostRepository( new DB() ), timeFormatService ), new ThemeService(), new Authenticator(), archiveService, timeFormatService );
+    adminController = new AdminController( new BlogPostService( new PostRepository( new DB() ), timeFormatService ), new ThemeService(), new UserService( new UserRepository( new DB() ) ), archiveService, timeFormatService );
 } else {
     console.log('there must be a mistake in the config file, because we have no db like this')
 }
@@ -93,6 +95,8 @@ if (selectedDb === 'mongodb') {
     app.get('/account/:id', authMiddleware, isAdminMiddleware, adminController.account.bind(adminController))
     app.post('/registerNewUser', authMiddleware, isAdminMiddleware, adminController.createNewAccount.bind(adminController))
     app.post('/editUser/:id', authMiddleware, isAdminMiddleware, adminController.editAccount.bind(adminController))
+    app.get('/config', authMiddleware, isAdminMiddleware, isSuperAdminMiddleware, adminController.getConfigView.bind(adminController))
+    app.post('/pageConfig', authMiddleware, isAdminMiddleware, isSuperAdminMiddleware, adminController.setConfig.bind(adminController))
 
     app.get('/logout', authMiddleware, loginController.logout)
 

@@ -5,47 +5,58 @@ dotenv.config({ path: './config.env' })
 
 
 module.exports = class ThemeService {
+  constructor() {
+    this.theme = process.env.SELECTED_THEME
+  }
 
-    findThemes() {
-        const themesPath = path.join(__dirname, '../public/themes/')
-        return new Promise((resolve, reject) => {
-            fs.readdir(themesPath, (err, themes) => {
-                if (err) {
-                    reject(err)
-                    return
-                }
-                resolve(themes)
+  getTheme() {
+    return this.theme
+  }
 
-            });
-        })
+  setTheme(selectedTheme) {
+    this.theme = selectedTheme
+  }
 
-    }
-
-    setTheme(selectedTheme) {
-        let configFile = fs.readFileSync('./config.env').toString()
-        configFile = configFile.replace(`SELECTED_THEME=${process.env.SELECTED_THEME}`, `SELECTED_THEME=${selectedTheme}`)
-        fs.writeFileSync('./config.env', configFile, err => {
-            if (err) {
-                console.log(err)
-            }
-        })
-        // reload the config file values
-        const envConfig = dotenv.parse(fs.readFileSync('./config.env'))
-        for (const k in envConfig) {
-            process.env[k] = envConfig[k]
+  findThemes() {
+    const themesPath = path.join(__dirname, '../public/themes/')
+    return new Promise((resolve, reject) => {
+      fs.readdir(themesPath, (err, themes) => {
+        if (err) {
+          reject(err)
+          return
         }
+        resolve(themes)
 
+      });
+    })
+
+  }
+
+  setTheme(selectedTheme) {
+    let configFile = fs.readFileSync('./config.env').toString()
+    configFile = configFile.replace(`SELECTED_THEME=${process.env.SELECTED_THEME}`, `SELECTED_THEME=${selectedTheme}`)
+    fs.writeFileSync('./config.env', configFile, err => {
+      if (err) {
+        console.log(err)
+      }
+    })
+    // reload the config file values
+    const envConfig = dotenv.parse(fs.readFileSync('./config.env'))
+    for (const k in envConfig) {
+      process.env[k] = envConfig[k]
     }
 
-    loadTheme() {
-        return process.env.SELECTED_THEME
-    }
+  }
 
-    createThemePath(selectedTheme) {
-        if (!selectedTheme) selectedTheme = this.loadTheme()
-        const themePath = `/themes/${selectedTheme}/bootstrap.css`
-        return themePath;
-    }
+  loadTheme() {
+    return process.env.SELECTED_THEME
+  }
+
+  createThemePath(selectedTheme) {
+    if (!selectedTheme) selectedTheme = this.loadTheme()
+    const themePath = `/themes/${selectedTheme}/bootstrap.css`
+    return themePath;
+  }
 
 
 

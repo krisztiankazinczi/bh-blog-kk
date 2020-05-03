@@ -1,27 +1,124 @@
+const NewPost = require('../utils/NewPost')
 
 class BlogPostService {
-    constructor(postRepository) {
+    constructor(postRepository, timeFormatService) {
         this.postRepository = postRepository;
+        this.timeFormatService = timeFormatService
     }
 
-    findAllPosts() {
-        return this.postRepository.findAllPosts();
+     async findAllPosts() {
+       try {
+        let posts = await this.postRepository.findAllPosts();
+        posts = posts.map(post => {
+          return new NewPost
+                (
+                  post.id, 
+                  post.title, 
+                  post.slug, 
+                  post.author, 
+                  this.timeFormatService.setTimeFormatOfPost(post.last_modified_at), 
+                  this.timeFormatService.setTimeFormatOfPost(post.published_at),
+                  post.content, 
+                  post.draft
+                )
+        }) 
+        return posts
+       } catch (error) {
+         return error
+       }
+        
     }
 
-    findSearchedFor(searchFor) {
-        return this.postRepository.findSearchedFor(searchFor);
+    async findSearchedFor(searchFor) {
+      try {
+        let posts = await this.postRepository.findSearchedFor(searchFor);
+        posts = posts.map(post => {
+          return new NewPost
+                (
+                  post.id, 
+                  post.title, 
+                  post.slug, 
+                  post.author, 
+                  this.timeFormatService.setTimeFormatOfPost(post.last_modified_at), 
+                  this.timeFormatService.setTimeFormatOfPost(post.published_at),
+                  post.content, 
+                  post.draft
+                )
+        }) 
+        return posts
+      } catch (error) {
+        return error
+      }
+        
     }
 
-    findPostById(id) {
-        return this.postRepository.findPostById(id);
+    async findPostById(id) {
+      try {
+        let post = await this.postRepository.findPostById(id);
+        return post = new NewPost
+                (
+                  post.id, 
+                  post.title, 
+                  post.slug, 
+                  post.author, 
+                  this.timeFormatService.setTimeFormatOfPost(post.last_modified_at), 
+                  this.timeFormatService.setTimeFormatOfPost(post.published_at),
+                  post.content, 
+                  post.draft,
+                  post.tags 
+                    ? 
+                      post.tags.split(',') 
+                    : 
+                      post.tags
+                )
+      } catch (error) {
+        return error
+      }
+        
     }
 
-    findAuthorOfPostById(id) {
-      return this.postRepository.findAuthorOfPostById(id)
+    async findAuthorOfPostById(id) {
+      try {
+        let post = await this.postRepository.findAuthorOfPostById(id)
+        if (post) {
+          post = new NewPost
+                (
+                  post.id, 
+                  post.title, 
+                  post.slug, 
+                  post.author, 
+                  this.timeFormatService.setTimeFormatOfPost(post.last_modified_at), 
+                  this.timeFormatService.setTimeFormatOfPost(post.published_at),
+                  post.content, 
+                  post.draft,
+                )
+        }
+        return post
+      } catch (error) {
+        return error
+      }
     }
 
-    findPostBySlug(slug, isActive) {
-        return this.postRepository.findPostBySlug(slug, isActive);
+    async findPostBySlug(slug, isActive) {
+      try {
+        let post = await this.postRepository.findPostBySlug(slug, isActive);
+        if (post) {
+          post = new NewPost
+                (
+                  post.id, 
+                  post.title, 
+                  post.slug, 
+                  post.author, 
+                  this.timeFormatService.setTimeFormatOfPost(post.last_modified_at), 
+                  this.timeFormatService.setTimeFormatOfPost(post.published_at),
+                  post.content, 
+                  post.draft,
+                )
+        }
+        return post
+      } catch (error) {
+        return error
+      }
     }
 
     createPost(newPost) {
@@ -40,16 +137,37 @@ class BlogPostService {
         return this.postRepository.updatePostAsDraft(updatedPost, id);
     }
 
-    async createArchive() {
-        return await this.getArchive();
-    }
-
     async findTags() {
-        return await this.postRepository.findTags()
+      try {
+        let [tagsInPost, tags] = await this.postRepository.findTags()       
+        tags = setSizeOfTags(tagsInPost, tags)
+        return tags
+      } catch (error) {
+        return error
+      }
+
     }
 
     async findPostsByTag(id) {
-        return await this.postRepository.findPostsByTag(id)
+      try {
+        let posts = await this.postRepository.findPostsByTag(id)
+        posts = posts.map(post => {
+          return new NewPost
+                (
+                  post.id, 
+                  post.title, 
+                  post.slug, 
+                  post.author, 
+                  this.timeFormatService.setTimeFormatOfPost(post.last_modified_at), 
+                  this.timeFormatService.setTimeFormatOfPost(post.published_at),
+                  post.content, 
+                  post.draft
+                )
+        }) 
+        return posts
+      } catch (error) {
+        return error
+      }
     }
 
     findActiveSlug(id) {
@@ -59,42 +177,34 @@ class BlogPostService {
     checkPublishedStatus(id) {
       return this.postRepository.checkPublishedStatus(id)
     }
-
-
-    async getArchive() {
-        try {
-            const result = await this.postRepository.findAllPosts();
-            const archive = {};
-            result.forEach((row, index) => {
-                if (!row.published_at) return
-                
-                const date = new Date(row.published_at);
-                const year = date.getFullYear();
-                const month = months[date.getMonth()];
-    
-                archive[year] = archive[year] || {}
-    
-                if (!archive[year][month]) {
-                    archive[year][month] = [{id: row.id, title: row.title}]
-                    return;
-                } 
-                    
-                archive[year][month].push({id: row.id, title: row.title});
-                
-            })
-            return archive
-        } catch (error) {
-            console.log(error)
-        }
-        
-    }
+   
 }
 
-const months = [ "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December" ];
-
-
-
-
-
 module.exports = BlogPostService;
+
+
+
+const SMALL_TAG = 3;
+const MEDIUM_TAG = 6;
+
+const smallFontSizeClassName = "small-font-size"
+const mediumFontSizeClassName = "medium-font-size"
+const bigFontSizeClassName = "big-font-size"
+
+
+function setSizeOfTags(tagsInPost, tags) {
+  
+  tagsInPost.forEach(postTag => tags.map(tag => {
+    if (postTag.tag_id === tag.id) {
+      (!tag['timesUsed']) ? tag['timesUsed'] = 1 : tag['timesUsed'] += 1;
+    } 
+  }))
+
+  tags.forEach(tag => {
+    if (tag.timesUsed <= SMALL_TAG) tag.size = smallFontSizeClassName
+    if (tag.timesUsed <= MEDIUM_TAG) tag.size = mediumFontSizeClassName
+    if (tag.timesUsed > MEDIUM_TAG) tag.size = bigFontSizeClassName
+  })
+
+  return tags;
+}

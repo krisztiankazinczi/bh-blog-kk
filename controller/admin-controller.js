@@ -16,10 +16,12 @@ const fs = require('fs')
 const slugify = require('slugify')
 
 module.exports = class AdminController {
-    constructor(blogPostService, themeService, userService) {
+    constructor(blogPostService, themeService, userService, archiveService, timeFormatService) {
         this.blogPostService = blogPostService
         this.themeService = themeService
         this.userService = userService
+        this.archiveService = archiveService
+        this.timeFormatService = timeFormatService
         this.theme = this.themeService.createThemePath()
     }
 
@@ -49,13 +51,16 @@ module.exports = class AdminController {
       const { username, isAdmin } = req.session.user
       posts = posts.map(post => post.author === username || isAdmin === 1 ? {...post, authorized: true} : {...post, authorizited: false})
 
+      const { style, createArchive } = this.archiveService.whichArchiveStyleIsActive()
+
         res.render('admin-post-list', {
             layout: 'blog',
             title: 'Blog Title',
             posts,
-            archive: await this.blogPostService.createArchive(),
+            archive: createArchive(await this.blogPostService.findAllPosts()),
             tags: await this.blogPostService.findTags(),
-            css: this.getTheme()
+            css: this.getTheme(),
+            [style]: true
         });
     }
 
@@ -139,6 +144,27 @@ module.exports = class AdminController {
         if (draft) await this.blogPostService.updatePostAsDraft(updatedPost, id)
         else await this.blogPostService.updatePost(updatedPost, id)
         res.redirect('/adminPostList')
+    }
+
+    getConfigView(req, res) {
+      const {success, error } = req.query
+      res.render('admin-config-view', {
+        layout: 'main',
+        css: this.theme,
+        success,
+        error
+      })
+    }
+
+    setConfig(req, res) {
+      const { archiveStyle, date_format } = req.body
+      const archiveStyleChange = this.archiveService.selectArchiveStyle(archiveStyle)
+      const dateFormatChange = this.timeFormatService.updateTimeFormat(date_format)
+      if (archiveStyleChange && dateFormatChange) {
+        res.redirect('/config?success=true')
+        return
+      } 
+      res.redirect('/config?error=true')
     }
 
     getDBSettings(req, res) {

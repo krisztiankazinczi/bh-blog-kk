@@ -1,0 +1,79 @@
+<div class="container vh-100">
+  <form action="/pageConfig" method="POST">
+
+    <div class="row rounded pt-2 pb-2 mt-2 mb-3">
+      <div class="col-2"></div>
+      <div class="col-6">
+        <p class="mt-5 ">
+          <i>Please specify the appearance of the archive menu<br></i>
+        </p>
+      </div>
+      <div class="col-4"></div>
+
+    </div>
+
+    <div class="row rounded pt-2 pb-2">
+      <div class="col-1"></div>
+      <div class="col-4 text-right font-weight-bold">
+        <h4><strong>Select style of Archive:</strong></h4>
+      </div>
+      <div class="col-2">
+        <select class="w-100 form-control input-lg " name="archiveStyle">
+          <option value="tree">Tree</option>
+          <option value="list">List</option>
+        </select>
+      </div>
+      <div class="col-5"></div>
+    </div>
+
+    <div class="row rounded pt-2 pb-2 mt-2 mb-3">
+      <div class="col-2"></div>
+      <div class="col-6">
+        <p class="mt-5">
+          <i>Please type here the timeformat of all the dates on the webpage:<br>
+            Please use the following nomenclature! In the field you should write the values on the right side<br></p>
+        <ul>
+          <li>reference of year = YYYY</li>
+          <li>reference of month = MM</li>
+          <li>reference of month written name = Month</li>
+          <li>reference of day = DD</li>
+          <li>reference of hour = H</li>
+          <li>reference of minute = M</li>
+          <li>reference of secundum = S</li>
+        </ul>
+      </div>
+      <div class="col-4"></div>
+
+    </div>
+
+    <div class="row rounded pt-2 pb-2">
+      <div class="col-1"></div>
+      <div class="col-4 text-right">
+        <h4><strong>Select date format:</strong></h4>
+      </div>
+      <div class="col-4">
+        <select class="w-100 form-control input-lg " name="date_format">
+          <option value="1">YYYY-MM-DD H:M:S</option>
+          <option value="2">YYYY-Month-DD H:M:S</option>
+          <option value="3">DD/MM/YYYY H:M:S</option>
+          <option value="4">DD/Month/YYYY H:M:S</option>
+
+        </select>
+      </div>
+      <div class="col-3"></div>
+    </div>
+
+    <div class="row rounded pt-2 pb-2 mt-4">
+      <div class="col-2"></div>
+      <div class="col-8">
+        <input type="submit" class="btn btn-info w-75">
+      </div>
+      <div class="col-3"></div>
+    </div>
+
+  </form>
+
+  {{#if error}}<h4 class="text-danger">We are really sorry, but something went wront, please try it again!
+  </h4>{{/if}}
+  {{#if success}}<h4 class="text-success">The changes have been implemented successfully</h4>{{/if}}<br>
+</div>

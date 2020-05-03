@@ -1,6 +1,3 @@
-const NewPost = require('../utils/NewPost')
-const setSizeOfTags = require('../utils/set-size-of-tags')
-
 module.exports = class PostRepository {
   constructor(db) {
     this.db = db;
@@ -26,11 +23,9 @@ module.exports = class PostRepository {
                             ORDER BY 
                               published_at DESC`
     try {
-      let allPosts = await this.db.all(sqlGetAllPosts);
-      allPosts = allPosts.map(post => new NewPost(post.id, post.title, post.slug, post.author, post.last_modified_at, post.published_at, post.content, post.draft))
-      return allPosts;
+      return await this.db.all(sqlGetAllPosts);
     } catch (error) {
-      console.error(error);
+      return error
     }
   }
 
@@ -63,14 +58,10 @@ module.exports = class PostRepository {
                               OR 
                                 author LIKE ?
                               )`
-
-    // const sqlGetAllFilteredPosts = `SELECT id, title, slug, author, last_modified_at, published_at, content, draft FROM posts WHERE content LIKE ? OR title LIKE ?`
     try {
-      let allPosts = await this.db.all(sqlGetAllFilteredPosts, [searchFor, searchFor, searchFor]);
-      allPosts = allPosts.map(post => new NewPost(post.id, post.title, post.slug, post.author, post.last_modified_at, post.published_at, post.content, post.draft))
-      return allPosts;
+      return await this.db.all(sqlGetAllFilteredPosts, [searchFor, searchFor, searchFor]);
     } catch (error) {
-      console.error(error);
+      return error
     }
   }
 
@@ -81,6 +72,8 @@ module.exports = class PostRepository {
                               slugs.slug,
                               posts.author,
                               posts.content,
+                              posts.last_modified_at,
+                              posts.published_at,
                               posts.draft,
                               group_concat(tags_in_post.tag_id) as tags
                             FROM
@@ -99,11 +92,9 @@ module.exports = class PostRepository {
                               slugs.isActive = 1`
 
     try {
-      let post = await this.db.get(sqlGetPostById, [id]);
-      post = new NewPost(post.id, post.title, post.slug, post.author, post.last_modified_at, post.published_at, post.content, post.draft, post.tags ? post.tags.split(',') : post.tags)
-      return post;
+      return await this.db.get(sqlGetPostById, [id]);
     } catch (error) {
-      console.error(error);
+      return error
     }
   }
 
@@ -124,7 +115,6 @@ module.exports = class PostRepository {
   }
 
   async findPostBySlug(slug, isActive) {
-    // const sqlGetPostBySlug = 'SELECT id, title, slug, author, last_modified_at, published_at, content, draft FROM posts WHERE slug = ?'
     const sqlGetPostBySlug = `SELECT
                                 posts.id,
                                 posts.title,
@@ -144,12 +134,9 @@ module.exports = class PostRepository {
                               AND
                                 slugs.isActive = ?`
     try {
-      let post = await this.db.get(sqlGetPostBySlug, [slug, isActive]);
-
-      if (post) post = new NewPost(post.id, post.title, post.slug, post.author, post.last_modified_at, undefined, post.content, post.draft)
-      return post;
+      return await this.db.get(sqlGetPostBySlug, [slug, isActive]);
     } catch (error) {
-      console.error(error);
+      return error
     }
   }
 
@@ -171,11 +158,11 @@ module.exports = class PostRepository {
   }
 
   async createDraft(newPost) {
-    const sqlcreateNewDraft = 'INSERT INTO posts(title, slug, author, last_modified_at, published_at, content, draft) VALUES (?,?,?,?,?,?,?)';
+    const sqlcreateNewDraft = 'INSERT INTO posts(title, author, last_modified_at, published_at, content, draft) VALUES (?,?,?,?,?,?)';
     const sqlAddActiveSlug = 'INSERT INTO slugs(post_id, slug, isActive) VALUES (?,?,?)'
     const sqladdTags = 'INSERT INTO tags_in_post(post_id, tag_id) VALUES (?,?)'
     try {
-      const lastID = await this.db.run(sqlcreateNewDraft, [newPost.title, newPost.slug, newPost.author, newPost.last_modified_at, newPost.published_at, newPost.content, newPost.draft])
+      const lastID = await this.db.run(sqlcreateNewDraft, [newPost.title, newPost.author, newPost.last_modified_at, newPost.published_at, newPost.content, newPost.draft])
 
       if (newPost.slug) await this.db.run(sqlAddActiveSlug, [lastID, newPost.slug, 1])
 
@@ -223,7 +210,6 @@ module.exports = class PostRepository {
       }
     
     } catch (error) {
-      console.error(error);
       return error
     }
   }
@@ -233,12 +219,11 @@ module.exports = class PostRepository {
     const sqlFindAllTags = 'SELECT id, name FROM tags ORDER BY name DESC'
     const sqlFindTagsInPOst = 'SELECT post_id, tag_id FROM tags_in_post'
     try {
-      let tags = await this.db.all(sqlFindAllTags);
+      const tags = await this.db.all(sqlFindAllTags);
       const tagsInPost = await this.db.all(sqlFindTagsInPOst)
-      tags = setSizeOfTags(tagsInPost, tags)
-      return tags;
+      return [tagsInPost, tags];
     } catch (error) {
-      console.error(error);
+      return error
     }
   }
 
@@ -267,10 +252,10 @@ module.exports = class PostRepository {
                           AND
                             slugs.isActive = 1`
     try {
-      const results = await this.db.all(sqlFindByTag, [id])
-      return results
+      const posts = await this.db.all(sqlFindByTag, [id])
+      return posts
     } catch (error) {
-      console.log(error)
+      return error
     }
   }
 

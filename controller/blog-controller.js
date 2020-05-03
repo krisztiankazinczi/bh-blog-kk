@@ -5,22 +5,36 @@ const { validateNewPost } = require('./validation/new-post-validation');
 const slugify = require('slugify')
 
 module.exports = class BlogController {
-    constructor(blogPostService, themeService, authenticator) {
+    constructor(blogPostService, themeService, authenticator, archiveService) {
         this.blogPostService = blogPostService;
         this.themeService = themeService
         this.authenticator = authenticator
+        this.archiveService = archiveService
     }
 
     async get(req, res) {
         const { searchFor } = req.query;
-        const blogs = (searchFor) ? await this.blogPostService.findSearchedFor(searchFor) : await this.blogPostService.findAllPosts()
+        const blogs =
+           (searchFor) 
+              ? 
+                await this.blogPostService.findSearchedFor(searchFor) 
+              : 
+                await this.blogPostService.findAllPosts()
+
+        /**
+         * @param {string} style - Name of ArchiveStyle or error
+         * @param {function} createArchive - the callable archive function to get archive!!!
+         */
+        const { style, createArchive } = this.archiveService.whichArchiveStyleIsActive()
+
         res.render('post-list', {
-            layout: 'blog',
-            title: 'Blog Title',
-            blogs: blogs,
-            archive: await this.blogPostService.createArchive(),
-            tags: await this.blogPostService.findTags(),
-            css: this.themeService.createThemePath()
+          layout: 'blog',
+          title: 'Blog Title',
+          blogs: blogs,
+          archive: createArchive(await this.blogPostService.findAllPosts()),
+          tags: await this.blogPostService.findTags(),
+          css: this.themeService.createThemePath(),
+          [style]: true // general property adding - style will always contain a string and accorsing to this string handlebars will render the proper style or error
         });
     }
 
@@ -32,14 +46,18 @@ module.exports = class BlogController {
         if (post) await this.blogPostService.findPostById(post.id)
         let error = false;
         if (!post) error = true 
+
+        const { style, createArchive } = this.archiveService.whichArchiveStyleIsActive()
+
         res.render('read-post-view', {
             layout: 'blog',
             // title: post.title,
             post,
-            archive: await this.blogPostService.createArchive(),
+            archive: createArchive(await this.blogPostService.findAllPosts()),
             tags: await this.blogPostService.findTags(),
             css: this.themeService.createThemePath(),
-            error
+            error,
+            [style]: true
         })
     }
 
@@ -94,13 +112,17 @@ module.exports = class BlogController {
     async getPostsByTag(req, res) {
         const {id} = req.params
         const blogs = await this.blogPostService.findPostsByTag(id)
+
+        const { style, createArchive } = this.archiveService.whichArchiveStyleIsActive()
+
         res.render('post-list', {
             layout: 'blog',
             title: 'Post Title',
             blogs,
-            archive: await this.blogPostService.createArchive(),
+            archive: createArchive(await this.blogPostService.findAllPosts()),
             tags: await this.blogPostService.findTags(),
-            css: this.themeService.createThemePath()
+            css: this.themeService.createThemePath(),
+            [style]: true
         })
     }
 
