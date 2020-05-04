@@ -14,7 +14,7 @@ module.exports = class PostRepository {
                               posts.draft 
                             FROM 
                               posts 
-                            INNER JOIN
+                            LEFT JOIN
                               slugs
                             ON
                               posts.id = slugs.post_id
@@ -25,7 +25,7 @@ module.exports = class PostRepository {
     try {
       return await this.db.all(sqlGetAllPosts);
     } catch (error) {
-      return error
+      throw new Error(`findAllPosts() in post_repository. Err: ${error} `)
     }
   }
 
@@ -42,7 +42,7 @@ module.exports = class PostRepository {
                               posts.draft 
                             FROM 
                               posts 
-                            INNER JOIN
+                            LEFT JOIN
                               slugs
                             ON
                               posts.id = slugs.post_id
@@ -61,7 +61,7 @@ module.exports = class PostRepository {
     try {
       return await this.db.all(sqlGetAllFilteredPosts, [searchFor, searchFor, searchFor]);
     } catch (error) {
-      return error
+      throw new Error(`findSearchedFor() in post_repository. function argument: searchFor: ${searchFor} Err: ${error} `)
     }
   }
 
@@ -82,7 +82,7 @@ module.exports = class PostRepository {
                               posts 
                             ON 
                               posts.id = tags_in_post.post_id
-                            INNER JOIN
+                            LEFT JOIN
                               slugs 
                             ON
                               posts.id = slugs.post_id
@@ -94,7 +94,7 @@ module.exports = class PostRepository {
     try {
       return await this.db.get(sqlGetPostById, [id]);
     } catch (error) {
-      return error
+      throw new Error(`findPostById() in post_repository. function argument: id: ${id} Err: ${error} `)
     }
   }
 
@@ -110,7 +110,7 @@ module.exports = class PostRepository {
       const author = await this.db.get(sqlFindAuthor, [id])
       return author.author
     } catch (error) {
-      return error
+      throw new Error(`findAuthorOfPostById() in post_repository. function argument: id: ${id} Err: ${error} `)
     }
   }
 
@@ -136,7 +136,7 @@ module.exports = class PostRepository {
     try {
       return await this.db.get(sqlGetPostBySlug, [slug, isActive]);
     } catch (error) {
-      return error
+      throw new Error(`findPostBySlug() in post_repository. function argument: slug: ${slug}, isActive: ${isActive} Err: ${error} `)
     }
   }
 
@@ -153,7 +153,7 @@ module.exports = class PostRepository {
       if (newPost.tags) await Promise.all(newPost.tags.map(tag => this.db.run(sqladdTags, [lastID, tag])))
 
     } catch (error) {
-      console.error(error);
+      throw new Error(`createPost() in post_repository. function argument: newPost: ${newPost}. Err: ${error} `)
     }
   }
 
@@ -168,7 +168,7 @@ module.exports = class PostRepository {
 
       if (newPost.tags) await Promise.all(newPost.tags.map(tag => this.db.run(sqladdTags, [lastID, tag])))
     } catch (error) {
-      console.error(error);
+      throw new Error(`createDraft() in post_repository. function argument: newPost: ${newPost}. Err: ${error} `)
     }
   }
 
@@ -189,7 +189,7 @@ module.exports = class PostRepository {
       }
     } catch (error) {
       console.error(error);
-      return error
+      throw new Error(`updatePost() in post_repository. function argument: updatedPost: ${updatedPost}, id: ${id}. Err: ${error} `)
     }
   }
 
@@ -210,7 +210,7 @@ module.exports = class PostRepository {
       }
     
     } catch (error) {
-      return error
+      throw new Error(`updatePostAsDraft() in post_repository. function argument: updatedPost: ${updatedPost}, id: ${id}. Err: ${error} `)    
     }
   }
 
@@ -223,7 +223,7 @@ module.exports = class PostRepository {
       const tagsInPost = await this.db.all(sqlFindTagsInPOst)
       return [tagsInPost, tags];
     } catch (error) {
-      return error
+      throw new Error(`findTags() in post_repository. Err: ${error} `) 
     }
   }
 
@@ -255,7 +255,7 @@ module.exports = class PostRepository {
       const posts = await this.db.all(sqlFindByTag, [id])
       return posts
     } catch (error) {
-      return error
+      throw new Error(`findPostsByTag() in post_repository. Function argument: id: ${id}. Err: ${error} `) 
     }
   }
 
@@ -272,7 +272,7 @@ module.exports = class PostRepository {
       const slug = await this.db.get(sqlFindSlug, [id])
       return slug.slug
     } catch (error) {
-      return error
+      throw new Error(`findActiveSlug() in post_repository. Function argument: id: ${id}. Err: ${error} `) 
     }
   }
 
@@ -287,7 +287,7 @@ module.exports = class PostRepository {
       const publishedAt = await this.db.get(findPublishedAtOfPost, [id])
       return publishedAt.published_at
     } catch (error) {
-      return error
+      throw new Error(`checkPublishedStatus() in post_repository. Function argument: id: ${id}. Err: ${error} `) 
     }
   }
 }

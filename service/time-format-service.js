@@ -30,7 +30,7 @@ module.exports = new class TimeFormatService {
    * 
    * @param {Date} unixTimeStamp 
    */
-  setTimeFormatOfPost(unixTimeStamp) {
+  setTimeFormat(unixTimeStamp) {
 
     if (!unixTimeStamp) return 0 
 

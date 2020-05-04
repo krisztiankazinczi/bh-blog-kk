@@ -16,15 +16,15 @@ class BlogPostService {
                   post.title, 
                   post.slug, 
                   post.author, 
-                  this.timeFormatService.setTimeFormatOfPost(post.last_modified_at), 
-                  this.timeFormatService.setTimeFormatOfPost(post.published_at),
+                  this.timeFormatService.setTimeFormat(post.last_modified_at), 
+                  this.timeFormatService.setTimeFormat(post.published_at),
                   post.content, 
                   post.draft
                 )
         }) 
         return posts
        } catch (error) {
-         return error
+        throw new Error(`findAllPosts() in blog-post-service. Err: ${error} `)
        }
         
     }
@@ -39,15 +39,15 @@ class BlogPostService {
                   post.title, 
                   post.slug, 
                   post.author, 
-                  this.timeFormatService.setTimeFormatOfPost(post.last_modified_at), 
-                  this.timeFormatService.setTimeFormatOfPost(post.published_at),
+                  this.timeFormatService.setTimeFormat(post.last_modified_at), 
+                  this.timeFormatService.setTimeFormat(post.published_at),
                   post.content, 
                   post.draft
                 )
         }) 
         return posts
       } catch (error) {
-        return error
+        throw new Error(`findSearchedFor() in blog-post-service: return data: arguments searchFor: ${searchFor}. Err: ${error} `)
       }
         
     }
@@ -61,42 +61,20 @@ class BlogPostService {
                   post.title, 
                   post.slug, 
                   post.author, 
-                  this.timeFormatService.setTimeFormatOfPost(post.last_modified_at), 
-                  this.timeFormatService.setTimeFormatOfPost(post.published_at),
+                  this.timeFormatService.setTimeFormat(post.last_modified_at), 
+                  this.timeFormatService.setTimeFormat(post.published_at),
                   post.content, 
                   post.draft,
-                  post.tags 
-                    ? 
-                      post.tags.split(',') 
-                    : 
-                      post.tags
+                  post.tags ? post.tags.split(',') : post.tags
                 )
       } catch (error) {
-        return error
+        throw new Error(`findPostById() in blog-post-service: return data: post: ${post}, arguments id: ${id}. Err: ${error} `)
       }
         
     }
 
-    async findAuthorOfPostById(id) {
-      try {
-        let post = await this.postRepository.findAuthorOfPostById(id)
-        if (post) {
-          post = new NewPost
-                (
-                  post.id, 
-                  post.title, 
-                  post.slug, 
-                  post.author, 
-                  this.timeFormatService.setTimeFormatOfPost(post.last_modified_at), 
-                  this.timeFormatService.setTimeFormatOfPost(post.published_at),
-                  post.content, 
-                  post.draft,
-                )
-        }
-        return post
-      } catch (error) {
-        return error
-      }
+    findAuthorOfPostById(id) {
+      return this.postRepository.findAuthorOfPostById(id)
     }
 
     async findPostBySlug(slug, isActive) {
@@ -109,15 +87,15 @@ class BlogPostService {
                   post.title, 
                   post.slug, 
                   post.author, 
-                  this.timeFormatService.setTimeFormatOfPost(post.last_modified_at), 
-                  this.timeFormatService.setTimeFormatOfPost(post.published_at),
+                  this.timeFormatService.setTimeFormat(post.last_modified_at), 
+                  this.timeFormatService.setTimeFormat(post.published_at),
                   post.content, 
                   post.draft,
                 )
         }
         return post
       } catch (error) {
-        return error
+        throw new Error(`findPostBySlug() in blog-post-service: return data: post: ${post}, arguments slug: ${slug}, isActive: ${isActive}. Err: ${error} `)
       }
     }
 
@@ -143,7 +121,7 @@ class BlogPostService {
         tags = setSizeOfTags(tagsInPost, tags)
         return tags
       } catch (error) {
-        return error
+        throw new Error(`findTags() in blog-post-service: return data: tagsInPost: ${tagsInPost}, tags: ${tags}. Err: ${error} `)
       }
 
     }
@@ -158,15 +136,15 @@ class BlogPostService {
                   post.title, 
                   post.slug, 
                   post.author, 
-                  this.timeFormatService.setTimeFormatOfPost(post.last_modified_at), 
-                  this.timeFormatService.setTimeFormatOfPost(post.published_at),
+                  this.timeFormatService.setTimeFormat(post.last_modified_at), 
+                  this.timeFormatService.setTimeFormat(post.published_at),
                   post.content, 
                   post.draft
                 )
         }) 
         return posts
       } catch (error) {
-        return error
+        throw new Error(`findPostsByTag() in blog-post-service: return data: posts: ${posts}, argument id: ${id}. Err: ${error} `)
       }
     }
 
@@ -184,8 +162,9 @@ module.exports = BlogPostService;
 
 
 
-const SMALL_TAG = 3;
-const MEDIUM_TAG = 6;
+
+const SMALL_TAG_LIMIT = 3;
+const MEDIUM_TAG_LIMIT = 6;
 
 const smallFontSizeClassName = "small-font-size"
 const mediumFontSizeClassName = "medium-font-size"
@@ -201,9 +180,9 @@ function setSizeOfTags(tagsInPost, tags) {
   }))
 
   tags.forEach(tag => {
-    if (tag.timesUsed <= SMALL_TAG) tag.size = smallFontSizeClassName
-    if (tag.timesUsed <= MEDIUM_TAG) tag.size = mediumFontSizeClassName
-    if (tag.timesUsed > MEDIUM_TAG) tag.size = bigFontSizeClassName
+    if (tag.timesUsed <= SMALL_TAG_LIMIT) tag.size = smallFontSizeClassName
+    if (tag.timesUsed <= MEDIUM_TAG_LIMIT) tag.size = mediumFontSizeClassName
+    if (tag.timesUsed > MEDIUM_TAG_LIMIT) tag.size = bigFontSizeClassName
   })
 
   return tags;

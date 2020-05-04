@@ -64,6 +64,8 @@ module.exports = class AdminController {
         });
     }
 
+    
+
     async getPost(req, res) {
         const id = req.params.id;
         const post = await this.blogPostService.findPostById(id);
@@ -74,13 +76,17 @@ module.exports = class AdminController {
         }
         let tags = await this.blogPostService.findTags();
         tags = findSelectedTags(post.tags, tags)
+
+        const { style, createArchive } = this.archiveService.whichArchiveStyleIsActive()
+
         res.render('admin-edit-post', {
             layout: 'summernote',
             title: post.title,
             post,
-            archive: await this.blogPostService.createArchive(),
+            archive: createArchive(await this.blogPostService.findAllPosts()),
             tags,
-            css: this.getTheme()
+            css: this.getTheme(),
+            [style]: true
         })
     }
 
@@ -99,6 +105,7 @@ module.exports = class AdminController {
         if (req.session.user.isAdmin === 1) {
           try {
             const postAuthor = await this.blogPostService.findAuthorOfPostById(id)
+            console.log(postAuthor)
             author = postAuthor 
           } catch (error) {
             console.log(error)
@@ -271,7 +278,12 @@ module.exports = class AdminController {
             }
             else {
                 console.log('invalid filetype');
-                fs.unlinkSync(file.path);
+                try {
+                  fs.unlinkSync(file.path);
+                } catch (error) {
+                  
+                }
+                
                 console.log('Deleted: ' + file.path);
                 res.redirect('/selectTheme?error=invalid-file-type');
             }
@@ -384,6 +396,7 @@ async function extractAndDeleteZippedFolder(zipPath, targetPath) {
         })
     } catch (err) {
         console.log(err)
+        throw new Error('inserting valami:' + err)
     }
 }
 

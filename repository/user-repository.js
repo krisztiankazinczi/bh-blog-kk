@@ -25,7 +25,7 @@ module.exports = class UserRepository {
       if (user) user = new NewUser(user.id, user.name, user.username, user.password, user.email, user.isAdmin, user.isSuperAdmin)
       return user;
     } catch (error) {
-      console.error(error);
+      throw new Error(`findUserByUsername() in user-repository. function arguments: username: ${username}. Err: ${error} `)
     }
   }
 
@@ -46,8 +46,7 @@ module.exports = class UserRepository {
       users = users.map(user => new NewUser(user.id, user.name, user.username, user.password, user.email, user.isAdmin, user.isSuperAdmin)) 
       return users;
     } catch (error) {
-      console.error(error);
-    }
+      throw new Error(`findUsers() in user-repository. Err: ${error} `)    }
   }
 
   async registerUser(newUser) {
@@ -68,7 +67,7 @@ module.exports = class UserRepository {
       const lastID = await this.db.run(insertNewUser, [newUser.name, newUser.username, newUser.password, newUser.email, newUser.isAdmin, newUser.isSuperAdmin]);
       return lastID;
     } catch (error) {
-      console.error(error);
+      throw new Error(`registerUser() in user-repository. function arguments: newUser: ${newUser}. Err: ${error} `)
     } 
   }
 
@@ -88,7 +87,7 @@ module.exports = class UserRepository {
         const isItExists = this.db.get(IsEmailOrUsernameExists, [username, email])
         return isItExists
       } catch (error) {
-        return error
+        throw new Error(`checkIfUsernameOrEmailExist() in user-repository. function arguments: username: ${username}, email: ${email}. Err: ${error} `)
       }
   }
 
@@ -112,7 +111,7 @@ module.exports = class UserRepository {
       if (userDetails) userDetails = new NewUser(userDetails.id, userDetails.name, userDetails.username, userDetails.password, userDetails.email, userDetails.isAdmin, userDetails.isSuperAdmin)
       return userDetails;
     } catch (error) {
-      console.error(error);
+      throw new Error(`findUserById() in user-repository. function arguments: id: ${id}. Err: ${error} `)
     }
   }
 
@@ -133,7 +132,7 @@ module.exports = class UserRepository {
       await this.db.run(updateUserData, [editedUser.name, editedUser.username, editedUser.password, editedUser.email, editedUser.isAdmin, editedUser.isSuperAdmin, editedUser.id]);
       return
     } catch (error) {
-      console.error(error);
+      throw new Error(`editUserData() in user-repository. function arguments: editedUser: ${editedUser}. Err: ${error} `)
     } 
   }
 
@@ -156,7 +155,7 @@ module.exports = class UserRepository {
         const isItExists = this.db.get(IsEmailOrUsernameExists, [username, email, id])
         return isItExists
       } catch (error) {
-        return error
+        throw new Error(`isNewUsernameOrEmailExists() in user-repository. function arguments: username: ${username}, id: ${id}, email: ${email}. Err: ${error} `)
       }
   }
 
@@ -172,7 +171,7 @@ module.exports = class UserRepository {
       try {
         await this.db.run(changePassword, [password, email])
       } catch (error) {
-        return error
+        throw new Error(`changePassword() in user-repository. function arguments: password: ${password}, email: ${email}. Err: ${error} `)
       }
   }
 

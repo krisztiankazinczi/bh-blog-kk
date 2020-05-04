@@ -8,73 +8,90 @@ module.exports = class LoginService {
 
   async findUsers() {
     try {
-      const users = await this.userRepository.findUsers()
+      let users = await this.userRepository.findUsers()
+      users = users.map(user => {
+        return new NewUser  
+                    (
+                      user.id,
+                      user.name,
+                      user.username,
+                      user.password,
+                      user.email,
+                      user.isAdmin,
+                      user.isSuperAdmin
+                    )
+      })
       return users;
     } catch (error) {
-      console.log(error)
-      return error
+      throw new Error(`findUsers() in user-service. Err: ${error} `)
     }
   }
 
-  async insertNewUser(newUser) {
-    try {
-      await this.userRepository.insertNewUser(newUser)
-    } catch (error) {
-      return error
-    }
+  insertNewUser(newUser) {
+    return this.userRepository.insertNewUser(newUser)
   }
 
   async registerUser(userData) {
-    try {
-      const newUser = new NewUser(undefined, userData.name, userData.username, userData.pw, userData.email, userData.authority === 'admin' ? 1 : 0, userData.authority === 'superAdmin' ? 1 : 0)
-      await this.userRepository.registerUser(newUser)
-    } catch (error) {
-      return error
-    }
+      const newUser = new NewUser
+                          (
+                            undefined, 
+                            userData.name, 
+                            userData.username, 
+                            userData.pw, 
+                            userData.email, 
+                            userData.authority === 'admin' ? 1 : 0, 
+                            userData.authority === 'superAdmin' ? 1 : 0
+                          )
+      return this.userRepository.registerUser(newUser)
   }
 
-  async checkIfUsernameOrEmailExist(username, email) {
-    try {
-      const existsOrNot = await this.userRepository.checkIfUsernameOrEmailExist(username, email)
-      return existsOrNot;
-    } catch (error) {
-      return error
-    }
+  checkIfUsernameOrEmailExist(username, email) {
+    return this.userRepository.checkIfUsernameOrEmailExist(username, email)
   }
 
   async findUserById(id) {
     try {
-      const userDetails = await this.userRepository.findUserById(id)
-      return userDetails
+      let user = await this.userRepository.findUserById(id)
+      user = new NewUser  
+                    (
+                      user.id,
+                      user.name,
+                      user.username,
+                      user.password,
+                      user.email,
+                      user.isAdmin,
+                      user.isSuperAdmin
+                    )
+      return user;
     } catch (error) {
-      return error
+      throw new Error(`findUserById() in user-service. Function argument: id: ${id} Err: ${error} `)
     }
   }
 
   async editUserData(userData) {
     try {
-      const editedUser = new NewUser(userData.id, userData.name, userData.username, userData.pw, userData.email, userData.authority === 'superAdmin' ? 1 : userData.authority === 'admin' ? 1 : 0, userData.authority === 'superAdmin' ? 1 : 0)
+      const editedUser = new NewUser
+                          (
+                            userData.id, 
+                            userData.name, 
+                            userData.username, 
+                            userData.pw, 
+                            userData.email, 
+                            userData.authority === 'superAdmin' ? 1 
+                              : userData.authority === 'admin' ? 1 : 0, 
+                            userData.authority === 'superAdmin' ? 1 : 0)
       await this.userRepository.editUserData(editedUser)
     } catch (error) {
-      return error
+      throw new Error(`editUserData() in user-service. function arguments: editedUser: ${userdata}. Err: ${error} `)
     }
   }
 
-  async isNewUsernameOrEmailExists(username, email, id) {
-    try {
-      const existsOrNot = await this.userRepository.isNewUsernameOrEmailExists(username, email, id)
-      return existsOrNot;
-    } catch (error) {
-      return error
-    }
+  isNewUsernameOrEmailExists(username, email, id) {
+    return this.userRepository.isNewUsernameOrEmailExists(username, email, id)
   }
 
-  async changePassword(password, email) {
-    try {
-      await this.userRepository.changePassword(password, email)
-    } catch (error) {
-      return error
-    }
+  changePassword(password, email) {
+      return this.userRepository.changePassword(password, email)
   }
 
 }
