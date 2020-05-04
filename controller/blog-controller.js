@@ -1,5 +1,4 @@
 const NewPost = require('../utils/NewPost');
-// const authenticator = require('../service/authenticator');
 const { validateNewPost } = require('./validation/new-post-validation');
 
 const slugify = require('slugify')
@@ -14,12 +13,7 @@ module.exports = class BlogController {
 
     async get(req, res) {
         const { searchFor } = req.query;
-        const blogs =
-           (searchFor) 
-              ? 
-                await this.blogPostService.findSearchedFor(searchFor) 
-              : 
-                await this.blogPostService.findAllPosts()
+        const blogs = (searchFor) ? await this.blogPostService.findSearchedFor(searchFor) : await this.blogPostService.findAllPosts()
 
         /**
          * @param {string} style - Name of ArchiveStyle or error
@@ -51,7 +45,7 @@ module.exports = class BlogController {
 
         res.render('read-post-view', {
             layout: 'blog',
-            // title: post.title,
+            title: post ? post.title : 'We are sorry but this URL is not valid :(',
             post,
             archive: createArchive(await this.blogPostService.findAllPosts()),
             tags: await this.blogPostService.findTags(),
@@ -74,7 +68,6 @@ module.exports = class BlogController {
 
 
     async post(req, res) {
-      //if there is no tag selected, the findBYId function wont work, since it's an inner join with tags_in_post table
         const { title, content } = req.body;
 
         let  { slug, tags} = req.body;
@@ -124,6 +117,10 @@ module.exports = class BlogController {
             css: this.themeService.createThemePath(),
             [style]: true
         })
+    }
+
+    render404Page(req, res) {
+      res.render('404', {layout: '404'})
     }
 
 

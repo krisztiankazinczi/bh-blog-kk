@@ -101,6 +101,9 @@ if (selectedDb === 'mongodb') {
     app.get('/logout', authMiddleware, loginController.logout)
 
 
+    app.get('*', blogController.render404Page)
+
+
 
 
     app.listen(port, () => console.log(`Example app listening on port ${port}!`));
