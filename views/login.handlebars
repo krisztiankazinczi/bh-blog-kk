@@ -38,23 +38,33 @@
                         <div class="w-50"><a class="text-decoration-none" href="http://localhost:3000/forgot">Forgot Password?</a></div> 
                       </div> 
                     </div>
-                    {{#if error}}
+                    {{#if loginNeeded}}
                         <div class="row mt-3">
                         <div class="col-5">
                             
                         </div>
                         <div class="col-7">
-                            <p class="text-danger">{{error}}</p>
+                            <p class="text-danger">Please login!</p>
                         </div>
                     </div>
                     {{/if}}
-                    {{#if successLogout}}
+                    {{#if credentials}}
                         <div class="row mt-3">
                         <div class="col-5">
                             
                         </div>
                         <div class="col-7">
-                            <p class="text-success">{{successLogout}}</p>
+                            <p class="text-danger">Error! Invalid Credentials</p>
+                        </div>
+                    </div>
+                    {{/if}}
+                    {{#if successful}}
+                        <div class="row mt-3">
+                        <div class="col-5">
+                            
+                        </div>
+                        <div class="col-7">
+                            <p class="text-success">Logout Successful</p>
                         </div>
                     </div>
                     {{/if}}

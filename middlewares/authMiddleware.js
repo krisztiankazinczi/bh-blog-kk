@@ -9,7 +9,7 @@ function authMiddleware(req, res, next) {
 
     const session = authenticator.getSessions().find(s => s.id === ssid)
     if (!session) {
-        res.status(401).redirect('/login?error=loginNeeded')
+        res.status(401).redirect('/login?status=loginNeeded')
         return
     }
     

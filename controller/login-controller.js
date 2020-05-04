@@ -12,12 +12,12 @@ module.exports = class LoginController {
   }
 
   get(req, res) {
-    let error;
-    let successLogout;
-    if (req.query.error === 'credentials') error = 'Error! Invalid Credentials';
-    if (req.query.error === 'loginNeeded') error = 'Please login!';
-    if (req.query.logout === 'successful') successLogout = 'Logout Successful';
-    res.render('login', { layout: 'main', error, successLogout, css: this.themeService.createThemePath() });
+    const {status} = req.query
+    res.render('login', { 
+      layout: 'main', 
+      css: this.themeService.createThemePath(),
+      [status]: true 
+    });
   }
 
   async post(req, res) {
@@ -29,30 +29,24 @@ module.exports = class LoginController {
       res.redirect('/admin')
 
     }
-    else res.redirect('/login?error=credentials')
+    else res.redirect('/login?status=credentials')
   }
 
   logout(req, res) {
     res.clearCookie(AUTH_COOKIE)
     const logout = new Authenticator().deleteSession(req.session.id)
-    if (logout) res.redirect('/login?logout=successful')
+    if (logout) res.redirect('/login?status=successful')
     else res.redirect('/admin')
   }
 
   forgotPw(req, res) {
-    const { status } = req.query
-    let userError, serverError, success, pwChangeSuccess
-    if (status === 'userError') userError = true
-    if (status === 'serverError') serverError = true
-    if (status === 'success') success = true
-    if (status === 'pwChangeSuccess') pwChangeSuccess = true
+    const { status, emailTo } = req.query
+  
     res.render('forgot', {
       layout: 'main',
       css: this.themeService.createThemePath(),
-      userError,
-      serverError,
-      success,
-      pwChangeSuccess
+      [status]: true,
+      emailTo
     })
   }
 
@@ -95,11 +89,6 @@ module.exports = class LoginController {
 
   changePwPage(req, res) {
     const { token, status } = req.query;
-    let success, incorrectPw, serverError;
-
-    if (status === 'success') success = true
-    if (status === 'serverError') serverError = true
-    if (status === 'incorrectPw') incorrectPw = true
 
     let isTokenValid = this.resetPwTokenService.checkTokenValidity(token)
 
@@ -117,9 +106,7 @@ module.exports = class LoginController {
       layout: 'main',
       css: this.themeService.createThemePath(),
       isTokenValid,
-      serverError,
-      incorrectPw,
-      success
+      [status]: true
     })
 
   }
@@ -145,12 +132,6 @@ module.exports = class LoginController {
     }
     res.redirect(`/forgot/change?status=incorrectPw&token=${token}`)
   }
-
-
-
-
-
-
 
 }
 
