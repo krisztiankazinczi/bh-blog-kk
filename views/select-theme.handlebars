@@ -13,6 +13,8 @@
             </form>
             {{#if error}}<h4 class="text-danger">We are really sorry, but something went wront, please try it again!
             </h4>{{/if}}
+            {{#if serverError}}<h4 class="text-danger">We are really sorry, but something went wrong and could not get the proper data from database. Please try again later.
+            </h4>{{/if}}
             {{#if success}}<h4 class="text-success">The theme have been changed successfully!</h4>{{/if}}<br>
 
             <h4 class="text-danger">Please upload a zipped folder which contains a folder (foldername = theme name). In folder there must be a file (filename: bootstrap.css)!</h4>

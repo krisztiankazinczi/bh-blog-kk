@@ -155,6 +155,10 @@ class BlogPostService {
     checkPublishedStatus(id) {
       return this.postRepository.checkPublishedStatus(id)
     }
+
+    checkIfSlugExist(slug) {
+      return this.postRepository.checkIfSlugExist(slug)
+    }
    
 }
 

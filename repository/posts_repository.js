@@ -290,4 +290,19 @@ module.exports = class PostRepository {
       throw new Error(`checkPublishedStatus() in post_repository. Function argument: id: ${id}. Err: ${error} `) 
     }
   }
+
+  async checkIfSlugExist(slug) {
+    const checkIfSlugExist = `SELECT
+                                slug
+                              FROM
+                                slugs
+                              WHERE
+                                slug = ?`
+    try {
+      const isItExists = await this.db.get(checkIfSlugExist, [slug])
+      return isItExists.slug
+    } catch (error) {
+      throw new Error(`checkIfSlugExist() in post_repository. Function argument: slug: ${slug}. Err: ${error} `)
+    }
+  }
 }

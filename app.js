@@ -100,7 +100,7 @@ if (selectedDb === 'mongodb') {
 
     app.get('/logout', authMiddleware, loginController.logout)
 
-
+    app.get('/serverError', blogController.serverErrorPage)
     app.get('*', blogController.render404Page)
 
 
