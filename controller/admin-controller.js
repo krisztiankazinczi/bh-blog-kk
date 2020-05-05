@@ -46,48 +46,65 @@ module.exports = class AdminController {
   }
 
   async getPosts(req, res) {
-    let posts = await this.blogPostService.findAllPosts();
-    // everyone can see only their own posts or admins can see everyones posts
-    const { username, isAdmin } = req.session.user
-    posts = posts.map(post => post.author === username || isAdmin === 1 ? { ...post, authorized: true } : { ...post, authorizited: false })
 
-    const { style, createArchive } = this.archiveService.whichArchiveStyleIsActive()
+    try {
+      let posts = await this.blogPostService.findAllPosts();
+      // everyone can see only their own posts or admins can see everyones posts
+      const { username, isAdmin } = req.session.user
+      posts = posts.map(post => post.author === username || isAdmin === 1 ? { ...post, authorized: true } : { ...post, authorizited: false })
 
-    res.render('admin-post-list', {
-      layout: 'blog',
-      title: 'Blog Title',
-      posts,
-      archive: createArchive(await this.blogPostService.findAllPosts()),
-      tags: await this.blogPostService.findTags(),
-      css: this.getTheme(),
-      [style]: true
-    });
+      const { style, createArchive } = this.archiveService.whichArchiveStyleIsActive()
+
+      res.render('admin-post-list', {
+        layout: 'blog',
+        title: 'Blog Title',
+        posts,
+        archive: createArchive(await this.blogPostService.findAllPosts()),
+        tags: await this.blogPostService.findTags(),
+        css: this.getTheme(),
+        [style]: true
+      });
+    } catch (error) {
+      console.log(error)
+      res.redirect('/serverError')
+      return
+    }
+
   }
 
 
 
   async getPost(req, res) {
     const id = req.params.id;
-    const post = await this.blogPostService.findPostById(id);
-    // I won\t let anyone to edit someone else's posts if just type the correct url in browser
-    if (req.session.user.username !== post.author && req.session.user.isAdmin !== 1) {
-      res.redirect('/admin?authorization=true')
+
+    try {
+      const post = await this.blogPostService.findPostById(id);
+      // I won\t let anyone to edit someone else's posts if just type the correct url in browser
+      if (req.session.user.username !== post.author && req.session.user.isAdmin !== 1) {
+        res.redirect('/admin?authorization=true')
+        return
+      }
+      let tags = await this.blogPostService.findTags();
+      tags = findSelectedTags(post.tags, tags)
+
+      const { style, createArchive } = this.archiveService.whichArchiveStyleIsActive()
+
+      res.render('admin-edit-post', {
+        layout: 'summernote',
+        title: post.title,
+        post,
+        archive: createArchive(await this.blogPostService.findAllPosts()),
+        tags,
+        css: this.getTheme(),
+        [style]: true
+      })
+    } catch (error) {
+      console.log(error)
+      res.redirect('/serverError')
       return
     }
-    let tags = await this.blogPostService.findTags();
-    tags = findSelectedTags(post.tags, tags)
 
-    const { style, createArchive } = this.archiveService.whichArchiveStyleIsActive()
 
-    res.render('admin-edit-post', {
-      layout: 'summernote',
-      title: post.title,
-      post,
-      archive: createArchive(await this.blogPostService.findAllPosts()),
-      tags,
-      css: this.getTheme(),
-      [style]: true
-    })
   }
 
   async updatePost(req, res) {
@@ -100,95 +117,86 @@ module.exports = class AdminController {
 
     if (typeof tags === 'string') tags = [tags]
 
-    //If an admin edits the post he/she won't become the author of the post!!!!
-    let author;
-    if (req.session.user.isAdmin === 1) {
-      try {
-        const postAuthor = await this.blogPostService.findAuthorOfPostById(id)
-        console.log(postAuthor)
-        author = postAuthor
-      } catch (error) {
-        console.log(error)
-      }
-    } else author = req.session.user.username
-
     // create the necessary slug format if needed
 
     const correctSlug = checkSlugCorrectness(slug)
     if (!correctSlug && title) slug = slugify(title)
     if (!slug.includes('-') && slug.length > 0) slug += '-'
 
-    // Check if the slug changed or is it exists at all?
-
-    const isSlugExists = await this.blogPostService.checkIfSlugExist(slug)
-    if (isSlugExists) {
-      res.redirect(`/newPost?error=usedSlug&titleVal=${title}&slugVal=${slug}&contentVal=${content}`)
-      return
-    }
-
+    let author;
     let activeSlugInDb = '';
     let isNewActiveSlugNeeded = 0
+    let published_at = 0
 
     try {
+      //If an admin edits the post he/she won't become the author of the post!!!!
+      if (req.session.user.isAdmin === 1) {
+        const postAuthor = await this.blogPostService.findAuthorOfPostById(id)
+        author = postAuthor
+      } else {
+        author = req.session.user.username
+      }
+
+      // Check if the slug changed or is it exists at all?
+
+      const isSlugExists = await this.blogPostService.checkIfSlugExist(slug)
+      if (isSlugExists) {
+        res.redirect(`/newPost?error=usedSlug&titleVal=${title}&slugVal=${slug}&contentVal=${content}`)
+        return
+      }
+
       activeSlugInDb = await this.blogPostService.findActiveSlug(id)
       if (!activeSlugInDb || activeSlugInDb !== slug) isNewActiveSlugNeeded = 1
-    } catch (error) {
-      console.log(error)
-    }
 
-    // Check if it was published earlier, because I would not like to change the original published date
+      // Check if it was published earlier, because I would not like to change the original published date
 
-    let published_at = 0
-    try {
       published_at = await this.blogPostService.checkPublishedStatus(id) // if it's not 0, then it was published out earlier
+
+      const updatedPost = (draft)
+        ? new NewPost
+          (
+            id,
+            title,
+            slug,
+            author,
+            new Date(),
+            published_at,
+            content,
+            1,
+            tags,
+            isNewActiveSlugNeeded
+          )
+        : new NewPost
+          (
+            id,
+            title,
+            slug,
+            author,
+            new Date(),
+            published_at == 0 ? new Date() : published_at,
+            content,
+            0,
+            tags,
+            isNewActiveSlugNeeded
+          );
+
+      if (draft) await this.blogPostService.updatePostAsDraft(updatedPost, id)
+      else await this.blogPostService.updatePost(updatedPost, id)
+      res.redirect('/adminPostList')
+
     } catch (error) {
       console.log(error)
+      res.redirect('/serverError')
+      return
     }
-
-
-
-
-
-    const updatedPost = (draft)
-      ? new NewPost
-        (
-          id,
-          title,
-          slug,
-          author,
-          new Date(),
-          published_at,
-          content,
-          1,
-          tags,
-          isNewActiveSlugNeeded
-        )
-      : new NewPost
-        (
-          id,
-          title,
-          slug,
-          author,
-          new Date(),
-          published_at == 0 ? new Date() : published_at,
-          content,
-          0,
-          tags,
-          isNewActiveSlugNeeded
-        );
-
-    if (draft) await this.blogPostService.updatePostAsDraft(updatedPost, id)
-    else await this.blogPostService.updatePost(updatedPost, id)
-    res.redirect('/adminPostList')
   }
 
   getConfigView(req, res) {
-    const { success, error } = req.query
+    const { status } = req.query
     res.render('admin-config-view', {
       layout: 'main',
       css: this.theme,
-      success,
-      error
+      [status]: true
     })
   }
 
@@ -197,49 +205,51 @@ module.exports = class AdminController {
     const archiveStyleChange = this.archiveService.selectArchiveStyle(archiveStyle)
     const dateFormatChange = this.timeFormatService.updateTimeFormat(date_format)
     if (archiveStyleChange && dateFormatChange) {
-      res.redirect('/config?success=true')
+      res.redirect('/config?status=success')
       return
     }
-    res.redirect('/config?error=true')
+    res.redirect('/config?status=error')
   }
 
   getDBSettings(req, res) {
-    let { success, error } = req.query
-    let success1, success2, error1, error2;
-    if (success == 1) success1 = 'Please restart the server to start to use the selected database'
-    if (error == 1) error1 = 'We are sorry, but we can not change the database'
-    if (success == 2) success2 = 'The configuration of MongoDB Connection successfully has been changed'
-    if (error == 2) error2 = 'Weare sorry, but the provided details were not correct'
+    const { status } = req.query
     res.render('select-database', {
       layout: 'main',
-      success1,
-      error1,
-      success2,
-      error2,
-      css: this.getTheme()
+      css: this.getTheme(),
+      [status]: true
     })
   }
 
   setDB(req, res) {
     const { db } = req.body
 
-    let configFile = fs.readFileSync('./config.env').toString()
+    let configFile;
+    try {
+      configFile = fs.readFileSync('./config.env').toString()
+    } catch (error) {
+      console.log(error)
+      res.redirect('/serverError')
+      return
+    }
+
+
     configFile = configFile.replace(`SELECTED_DB=${process.env.SELECTED_DB}`, `SELECTED_DB=${db}`)
     fs.writeFileSync('./config.env', configFile, err => {
       if (err) {
         console.error(err)
-        res.redirect('/setDatabase?error=1')
+        res.redirect('/setDatabase?status=dbChangeError')
         return
       }
 
     })
-    res.redirect('/setDatabase?success=1')
+    res.redirect('/setDatabase?status=dbChangeSuccess')
 
   }
 
   configureMongoDB(req, res) {
     const { url, username, password } = req.body;
     if (url && username && password) {
+      // here I should do a connection try if the details are correct and if not send back the error
       let configFile = fs.readFileSync('./config.env').toString()
       configFile = configFile.replace(`DATABASE=${process.env.DATABASE}`, `DATABASE=${url}`)
       configFile = configFile.replace(`DATABASE_USERNAME=${process.env.DATABASE_USERNAME}`, `DATABASE_USERNAME=${username}`)
@@ -247,12 +257,14 @@ module.exports = class AdminController {
       fs.writeFileSync('./config.env', configFile, err => {
         if (err) {
           console.error(err)
-          res.redirect('/setDatabase?error=2')
+          res.redirect('/setDatabase?status=mongoConfigError')
           return
         }
       })
-      res.redirect('/setDatabase?success=2')
+      res.redirect('/setDatabase?status=mongoConfigSuccess')
+      return
     }
+    res.redirect('/setDatabase?status=missingField')
   }
 
   async findThemes(req, res) {

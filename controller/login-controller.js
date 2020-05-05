@@ -59,6 +59,7 @@ module.exports = class LoginController {
       // first parameter is undefined, since I am just reusing an other db request!!
       isUserExists = await this.userService.checkIfUsernameOrEmailExist(undefined, email)
     } catch (error) {
+      console.log(error)
       res.redirect('/forgot?status=serverError')
     }
     if (!isUserExists) {

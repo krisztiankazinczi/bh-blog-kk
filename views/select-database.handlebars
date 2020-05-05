@@ -10,8 +10,8 @@
                 </select>
                 <input type="submit" class="btn btn-info">
             </form>
-            <h3 class="text-success">{{#if success1}}{{success1}}{{/if}}</h3>
-            <h3 class="text-danger">{{#if error1}}{{error1}}{{/if}}</h3>
+            <h3 class="text-success">{{#if dbChangeSuccess}}Please restart the server to start to use the selected database{{/if}}</h3>
+            <h3 class="text-danger">{{#if dbChangeError}}We are sorry, but we can not change the database{{/if}}</h3>
 
 
             <div class="row mt-5">
@@ -58,9 +58,9 @@
                         <input type="submit" class="btn btn-danger w-75" value="Change the configuration">
                     </div>
                 </div>
-                <h3 class="text-success">{{#if success2}}{{success2}}{{/if}}</h3>
-                <h3 class="text-danger">{{#if error2}}{{error2}}{{/if}}</h3>
-
+                <h3 class="text-success">{{#if mongoConfigSuccess}}The configuration of MongoDB Connection successfully has been changed{{/if}}</h3>
+                <h3 class="text-danger">{{#if mongoConfigError}}We are sorry, but the provided details were not correct{{/if}}</h3>
+                <h3 class="text-danger">{{#if missingField}}Please fill all the fields before submit.{{/if}}</h3>
 
         </div>
     </div>
