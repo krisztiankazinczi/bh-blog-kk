@@ -77,9 +77,9 @@ module.exports = class PostRepository {
                               posts.draft,
                               group_concat(tags_in_post.tag_id) as tags
                             FROM
-                              tags_in_post
+                              posts
                             LEFT JOIN
-                              posts 
+                              tags_in_post 
                             ON 
                               posts.id = tags_in_post.post_id
                             LEFT JOIN
@@ -142,17 +142,22 @@ module.exports = class PostRepository {
 
 
   async createPost(newPost) {
+    const begin = 'BEGIN'
     const sqlcreateNewPost = 'INSERT INTO posts(title, author, last_modified_at, published_at, content, draft) VALUES (?,?,?,?,?,?)';
     const sqlAddActiveSlug = 'INSERT INTO slugs(post_id, slug, isActive) VALUES (?,?,?)'
     const sqladdTags = 'INSERT INTO tags_in_post(post_id, tag_id) VALUES (?,?)'
+    const commit = 'COMMIT'
+    const rollback = 'ROLLBACK'
     try {
+      await this.db.run(begin)
       const lastID = await this.db.run(sqlcreateNewPost, [newPost.title, newPost.author, newPost.last_modified_at, newPost.published_at, newPost.content, newPost.draft])
       
       await this.db.run(sqlAddActiveSlug, [lastID, newPost.slug, 1])
 
       if (newPost.tags) await Promise.all(newPost.tags.map(tag => this.db.run(sqladdTags, [lastID, tag])))
-
+      await this.db.run(commit)
     } catch (error) {
+      await this.db.run(rollback)
       throw new Error(`createPost() in post_repository. function argument: newPost: ${newPost}. Err: ${error} `)
     }
   }

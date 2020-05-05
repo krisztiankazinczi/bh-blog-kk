@@ -1,14 +1,28 @@
 <div class="col-12">
   <div class="text-right">
-    <a href="http://localhost:3000/logout">Logout</a>
+    <a href="http://localhost:3000/logout"><h2>Logout</h2></a>
   </div>
 
   <div class="d-flex justify-content-center align-items-center vh-100">
     <div class="container">
       <div class="row">
-        <div class="col-3"></div>
+        <div class="col-3 text-center">
+          <a href="http://localhost:3000/newPost"><img class="w-100 h-50" src="/icons/new-post.svg" alt="Create New Post"><br><h2>Create New Post</h2></a>
+        </div>
+        <div class="col-3 text-center">
+          <a href="http://localhost:3000/adminPostList"><img class="w-100 h-50" src="/icons/post-list.svg" alt="Post List"><br><h2>Post List</h2></a>
+        </div>
+        {{#if isAdmin}}
+        <div class="col-3 text-center">
+          <a href="http://localhost:3000/accounts"><img class="w-100 h-50" src="/icons/accounts.svg" alt="Accounts"><br><h2>Accounts</h2></a>
+        </div>
+        <div class="col-3 text-center">
+          <a href="http://localhost:3000/account"><img class="w-100 h-50" src="/icons/create-account.svg" alt="Create new Account"><br><h2>Create new Account</h2></a>
+        </div>
+        {{/if}}
+        {{!-- <div class="col-3"></div>
         <div class="col-6 text-center">
-            <a href="http://localhost:3000/newPost">Create New Post</a><br>
+            
             <a href="http://localhost:3000/adminPostList">Post List</a><br>
           {{#if isAdmin}}
             <a href="http://localhost:3000/accounts">Accounts</a><br>
@@ -19,11 +33,31 @@
             <a href="http://localhost:3000/selectTheme">Select Theme</a><br>
             <a href="http://localhost:3000/config">Config</a><br>
           {{/if}}
-          {{#if authorization}}<p class="text-danger mt-4">We are sorry, but you don't have authorization to see the content of that page</p> {{/if}}
+
         </div>
-        <div class="col-3"></div>
+        <div class="col-3"></div> --}}
+      </div>
+      {{#if isSuperAdmin}}
+      <div class="row text-center">
+        <div class="col-4 text-center">
+          <a href="http://localhost:3000/setDatabase"><img class="w-75 h-50" src="/icons/database.svg" alt="Select Database"><br><h2>Select Database</h2></a>
+        </div>
+        <div class="col-4 text-center">
+          <a href="http://localhost:3000/selectTheme"><img class="w-75 h-50" src="/icons/theme.svg" alt="Select Theme"><br><h2>Select Theme</h2></a>
+        </div>
+        <div class="col-4 text-center">
+          <a href="http://localhost:3000/config"><img class="w-75 h-50" src="/icons/configuration.svg" alt="Config"><br><h2>Config</h2></a>
+        </div>
+        {{!-- <div class="col-3 text-center">
+
+        </div> --}}
+      </div>
+      {{/if}}
+      <div class="row text-center">
+          {{#if authorization}}<p class="text-danger mt-4">We are sorry, but you don't have authorization to see the content of that page</p> {{/if}}
       </div>
 
+      </div>
     </div>
   </div>
 </div>

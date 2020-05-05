@@ -48,13 +48,6 @@ module.exports = new class ThemeService {
     })
 
     this.setTheme(selectedTheme)
-
-    // reload the config file values
-    // const envConfig = dotenv.parse(fs.readFileSync('./config.env'))
-    // for (const k in envConfig) {
-    //   process.env[k] = envConfig[k]
-    // }
-
   }
 
   loadTheme() {
@@ -66,9 +59,6 @@ module.exports = new class ThemeService {
     const themePath = `/themes/${selectedTheme}/bootstrap.css`
     return themePath;
   }
-
-
-
 
 }
 

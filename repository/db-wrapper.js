@@ -37,9 +37,11 @@ module.exports = class DB {
             db.serialize(() => {
                 db.run(sqlString, params, function (err) {
                     if (err) {
+                      if (sqlString === 'ROLLBACK') console.log('rollback meghivodik error agban')
                         reject(err);
                         return
                     }
+                    if (sqlString === 'ROLLBACK') console.log('rollback meghivodik nem error agban')
                     resolve(this.lastID)
                 })
             })
