@@ -233,6 +233,7 @@ module.exports = class PostRepository {
                             posts.title, 
                             posts.author, 
                             posts.last_modified_at, 
+                            posts.published_at, 
                             slugs.slug, 
                             posts.draft 
                           FROM 
@@ -270,7 +271,7 @@ module.exports = class PostRepository {
                           isActive = 1`
     try {
       const slug = await this.db.get(sqlFindSlug, [id])
-      return slug.slug
+      return slug ? slug.slug : slug
     } catch (error) {
       throw new Error(`findActiveSlug() in post_repository. Function argument: id: ${id}. Err: ${error} `) 
     }
@@ -300,9 +301,10 @@ module.exports = class PostRepository {
                                 slug = ?`
     try {
       const isItExists = await this.db.get(checkIfSlugExist, [slug])
-      return isItExists.slug
+      return isItExists ? isItExists.slug : isItExists
     } catch (error) {
       throw new Error(`checkIfSlugExist() in post_repository. Function argument: slug: ${slug}. Err: ${error} `)
     }
   }
+
 }

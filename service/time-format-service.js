@@ -50,13 +50,13 @@ module.exports = new class TimeFormatService {
         date = `${year}-${month + 1}-${day}  ${hour}:${min}:${sec}`
         break;
       case '2':
-        date = `${year}-${months[month + 1]}-${day}  ${hour}:${min}:${sec}`
+        date = `${year}-${months[month]}-${day}  ${hour}:${min}:${sec}`
         break;
       case '3':
         date = `${day}/${month + 1}/${year}  ${hour}:${min}:${sec}`
         break;
       case '4':
-        date = `${day}/${months[month + 1]}/${year}  ${hour}:${min}:${sec}`
+        date = `${day}/${months[month]}/${year}  ${hour}:${min}:${sec}`
         break;
       default:
         break;

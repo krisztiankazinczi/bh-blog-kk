@@ -130,6 +130,7 @@ class BlogPostService {
       try {
         let posts = await this.postRepository.findPostsByTag(id)
         posts = posts.map(post => {
+          console.log(post.published_at)
           return new NewPost
                 (
                   post.id, 
@@ -142,6 +143,7 @@ class BlogPostService {
                   post.draft
                 )
         }) 
+        console.log(posts)
         return posts
       } catch (error) {
         throw new Error(`findPostsByTag() in blog-post-service: return data: posts: ${posts}, argument id: ${id}. Err: ${error} `)
@@ -159,6 +161,7 @@ class BlogPostService {
     checkIfSlugExist(slug) {
       return this.postRepository.checkIfSlugExist(slug)
     }
+
    
 }
 
@@ -185,8 +188,8 @@ function setSizeOfTags(tagsInPost, tags) {
 
   tags.forEach(tag => {
     if (tag.timesUsed <= SMALL_TAG_LIMIT) tag.size = smallFontSizeClassName
-    if (tag.timesUsed <= MEDIUM_TAG_LIMIT) tag.size = mediumFontSizeClassName
-    if (tag.timesUsed > MEDIUM_TAG_LIMIT) tag.size = bigFontSizeClassName
+    else if (tag.timesUsed <= MEDIUM_TAG_LIMIT) tag.size = mediumFontSizeClassName
+    else if (tag.timesUsed > MEDIUM_TAG_LIMIT) tag.size = bigFontSizeClassName
   })
 
   return tags;

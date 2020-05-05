@@ -11,11 +11,15 @@ module.exports = class LoginController {
     this.emailService = emailService
   }
 
+  getTheme() {
+    return this.themeService.createThemePath()
+  }
+
   get(req, res) {
     const {status} = req.query
     res.render('login', { 
       layout: 'main', 
-      css: this.themeService.createThemePath(),
+      css: this.getTheme(),
       [status]: true 
     });
   }
@@ -44,7 +48,7 @@ module.exports = class LoginController {
   
     res.render('forgot', {
       layout: 'main',
-      css: this.themeService.createThemePath(),
+      css: this.getTheme(),
       [status]: true,
       emailTo
     })
@@ -105,7 +109,7 @@ module.exports = class LoginController {
 
     res.render('change-password', {
       layout: 'main',
-      css: this.themeService.createThemePath(),
+      css: this.getTheme(),
       isTokenValid,
       [status]: true
     })

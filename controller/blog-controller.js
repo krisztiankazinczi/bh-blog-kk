@@ -11,6 +11,10 @@ module.exports = class BlogController {
     this.archiveService = archiveService
   }
 
+  getTheme() {
+    return this.themeService.createThemePath()
+  }
+
   async get(req, res) {
     const { searchFor } = req.query;
     const blogs = (searchFor) ? await this.blogPostService.findSearchedFor(searchFor) : await this.blogPostService.findAllPosts()
@@ -31,7 +35,7 @@ module.exports = class BlogController {
         blogs: blogs,
         archive: createArchive(await this.blogPostService.findAllPosts()),
         tags: await this.blogPostService.findTags(),
-        css: this.themeService.createThemePath(),
+        css: this.getTheme(),
         [style]: true // general property adding - style will always contain a string and accorsing to this string handlebars will render the proper style or error
       });
     } catch (error) {
@@ -69,7 +73,7 @@ module.exports = class BlogController {
         post,
         archive: createArchive(await this.blogPostService.findAllPosts()),
         tags: await this.blogPostService.findTags(),
-        css: this.themeService.createThemePath(),
+        css: this.getTheme(),
         [style]: true
       })
     } catch (error) {
@@ -88,7 +92,7 @@ module.exports = class BlogController {
         layout: 'summernote',
         error,
         tags: await this.blogPostService.findTags(),
-        css: this.themeService.createThemePath()
+        css: this.getTheme()
       });
     } catch (error) {
       console.log(error)
@@ -120,6 +124,7 @@ module.exports = class BlogController {
       }
 
       try {
+        console.log(slug)
         const isSlugExists = await this.blogPostService.checkIfSlugExist(slug)
         if (isSlugExists) {
           res.redirect(`/newPost?error=usedSlug&titleVal=${title}&slugVal=${slug}&contentVal=${content}`)

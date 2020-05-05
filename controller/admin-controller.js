@@ -22,11 +22,10 @@ module.exports = class AdminController {
     this.userService = userService
     this.archiveService = archiveService
     this.timeFormatService = timeFormatService
-    this.theme = this.themeService.createThemePath()
   }
 
   getTheme() {
-    return this.theme
+    return this.themeService.createThemePath()
   }
 
   getDashboard(req, res) {
@@ -139,14 +138,16 @@ module.exports = class AdminController {
 
       // Check if the slug changed or is it exists at all?
 
-      const isSlugExists = await this.blogPostService.checkIfSlugExist(slug)
-      if (isSlugExists) {
-        res.redirect(`/newPost?error=usedSlug&titleVal=${title}&slugVal=${slug}&contentVal=${content}`)
-        return
-      }
-
       activeSlugInDb = await this.blogPostService.findActiveSlug(id)
       if (!activeSlugInDb || activeSlugInDb !== slug) isNewActiveSlugNeeded = 1
+
+      if (activeSlugInDb !== slug) {
+        const isSlugExists = await this.blogPostService.checkIfSlugExist(slug)
+        if (isSlugExists) {
+          res.redirect(`/newPost?error=usedSlug&titleVal=${title}&slugVal=${slug}&contentVal=${content}`)
+          return
+        }
+      }
 
       // Check if it was published earlier, because I would not like to change the original published date
 
@@ -195,7 +196,7 @@ module.exports = class AdminController {
     const { status } = req.query
     res.render('admin-config-view', {
       layout: 'main',
-      css: this.theme,
+      css: this.getTheme(),
       [status]: true
     })
   }
@@ -293,8 +294,8 @@ module.exports = class AdminController {
   setTheme(req, res) {
     const { selectedTheme } = req.body;
     try {
-      this.themeService.setTheme(selectedTheme)
-      this.theme = this.themeService.createThemePath(selectedTheme)
+      this.themeService.changeTheme(selectedTheme)
+      // this.theme = this.themeService.createThemePath(selectedTheme)
       res.redirect('/admin')
     } catch (error) {
       console.log(error)

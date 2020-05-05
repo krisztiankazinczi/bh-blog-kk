@@ -4,7 +4,7 @@ const dotenv = require('dotenv')
 dotenv.config({ path: './config.env' })
 
 
-module.exports = class ThemeService {
+module.exports = new class ThemeService {
   constructor() {
     this.theme = process.env.SELECTED_THEME
   }
@@ -32,19 +32,28 @@ module.exports = class ThemeService {
 
   }
 
-  setTheme(selectedTheme) {
-    let configFile = fs.readFileSync('./config.env').toString()
+  changeTheme(selectedTheme) {
+    let configFile;
+    try {
+      configFile = fs.readFileSync('./config.env').toString()
+    } catch (error) {
+      throw new Error(`setTheme() in theme-service.js. Function argument: selectedTheme: ${selectedTheme}. err: ${error}`)
+    }
     configFile = configFile.replace(`SELECTED_THEME=${process.env.SELECTED_THEME}`, `SELECTED_THEME=${selectedTheme}`)
     fs.writeFileSync('./config.env', configFile, err => {
       if (err) {
         console.log(err)
+        throw new error(`changeTheme function in theme-service. selectedTheme: ${selectedTheme} - writeFileSync was not successfull, err: ${err}`)
       }
     })
+
+    this.setTheme(selectedTheme)
+
     // reload the config file values
-    const envConfig = dotenv.parse(fs.readFileSync('./config.env'))
-    for (const k in envConfig) {
-      process.env[k] = envConfig[k]
-    }
+    // const envConfig = dotenv.parse(fs.readFileSync('./config.env'))
+    // for (const k in envConfig) {
+    //   process.env[k] = envConfig[k]
+    // }
 
   }
 
@@ -53,7 +62,7 @@ module.exports = class ThemeService {
   }
 
   createThemePath(selectedTheme) {
-    if (!selectedTheme) selectedTheme = this.loadTheme()
+    if (!selectedTheme) selectedTheme = this.getTheme()
     const themePath = `/themes/${selectedTheme}/bootstrap.css`
     return themePath;
   }
