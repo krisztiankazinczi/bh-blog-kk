@@ -130,7 +130,6 @@ class BlogPostService {
       try {
         let posts = await this.postRepository.findPostsByTag(id)
         posts = posts.map(post => {
-          console.log(post.published_at)
           return new NewPost
                 (
                   post.id, 
@@ -143,7 +142,6 @@ class BlogPostService {
                   post.draft
                 )
         }) 
-        console.log(posts)
         return posts
       } catch (error) {
         throw new Error(`findPostsByTag() in blog-post-service: return data: posts: ${posts}, argument id: ${id}. Err: ${error} `)

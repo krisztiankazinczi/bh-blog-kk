@@ -34,5 +34,10 @@
     "slugify": "^1.4.0",
     "sqlite3": "^4.1.1",
     "uid-safe": "^2.1.5"
+  },
+  "devDependencies": {
+    "jest": "^26.0.1",
+    "node-mocks-http": "^1.8.1",
+    "supertest": "^4.0.2"
   }
 }

@@ -31,7 +31,7 @@ module.exports = class BlogController {
     try {
       res.render('post-list', {
         layout: 'blog',
-        title: 'Blog Title',
+        title: 'Programming practicing',
         blogs: blogs,
         archive: createArchive(await this.blogPostService.findAllPosts()),
         tags: await this.blogPostService.findTags(),
@@ -69,7 +69,7 @@ module.exports = class BlogController {
 
       res.render('read-post-view', {
         layout: 'blog',
-        title: post.title,
+        title: 'Programming practicing',
         post,
         archive: createArchive(await this.blogPostService.findAllPosts()),
         tags: await this.blogPostService.findTags(),
@@ -124,7 +124,6 @@ module.exports = class BlogController {
       }
 
       try {
-        console.log(slug)
         const isSlugExists = await this.blogPostService.checkIfSlugExist(slug)
         if (isSlugExists) {
           res.redirect(`/newPost?error=usedSlug&titleVal=${title}&slugVal=${slug}&contentVal=${content}`)
@@ -197,7 +196,7 @@ module.exports = class BlogController {
     try {
       res.render('post-list', {
         layout: 'blog',
-        title: 'Post Title',
+        title: 'Programming practicing',
         blogs: await this.blogPostService.findPostsByTag(id),
         archive: createArchive(await this.blogPostService.findAllPosts()),
         tags: await this.blogPostService.findTags(),

@@ -7,21 +7,13 @@ const BlogController = require('./controller/blog-controller')
 const LoginController = require('./controller/login-controller')
 const AdminController = require('./controller/admin-controller')
 
-const UserService = require('./service/user-service')
-
-const themeService = require('./service/theme-service')
-
-const ResetPwTokenService = require('./service/reset-pw-token-service')
-
-const EmailService = require('./service/email-service')
-
-const archiveService = require('./service/archive-service')
-
-const timeFormatService = require('./service/time-format-service')
-
 const authMiddleware = require('./middlewares/authMiddleware')
 const isAdminMiddleware = require('./middlewares/is-admin-middleware')
 const isSuperAdminMiddleware = require('./middlewares/is-super-admin-middleware')
+
+const loginFactory = require('./service/factories/login-factory')
+const postFactory = require('./service/factories/post-factory')
+const adminFactory = require('./service/factories/admin-factory')
 
 const app = express();
 const port = 3000;
@@ -50,14 +42,9 @@ if (selectedDb === 'mongodb') {
     adminController = new AdminController(new BlogPostService(new PostRepositoryMongo(new mongoDB())), new ThemeService() );
     blogController = new BlogController(new BlogPostService(new PostRepositoryMongo(new mongoDB())), new ThemeService());
 } else if (selectedDb === 'sqlite3') {
-    const DB = require('./repository/db-wrapper');
-    const PostRepository = require('./repository/posts_repository')
-    const UserRepository = require('./repository/user-repository')
-    const Authenticator = require('./service/authenticator');
-
-    loginController = new LoginController( themeService, new Authenticator( new UserRepository( new DB() ) ), new ResetPwTokenService(), new UserService( new UserRepository( new DB() ) ), new EmailService() );
-    blogController = new BlogController( new BlogPostService( new PostRepository( new DB() ), timeFormatService ), themeService, new Authenticator(), archiveService, timeFormatService );
-    adminController = new AdminController( new BlogPostService( new PostRepository( new DB() ), timeFormatService ), themeService, new UserService( new UserRepository( new DB() ) ), archiveService, timeFormatService );
+    loginController = loginFactory.getLoginController()
+    blogController = postFactory.getBlogController()
+    adminController = adminFactory.getAdminController()
 } else {
     console.log('there must be a mistake in the config file, because we have no db like this')
 }

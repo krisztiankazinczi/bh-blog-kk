@@ -108,7 +108,7 @@ module.exports = class PostRepository {
 
     try {
       const author = await this.db.get(sqlFindAuthor, [id])
-      return author.author
+      return author ? author.author : author
     } catch (error) {
       throw new Error(`findAuthorOfPostById() in post_repository. function argument: id: ${id} Err: ${error} `)
     }

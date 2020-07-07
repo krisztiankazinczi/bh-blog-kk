@@ -56,7 +56,7 @@ module.exports = class AdminController {
 
       res.render('admin-post-list', {
         layout: 'blog',
-        title: 'Blog Title',
+        title: 'Programming practicing',
         posts,
         archive: createArchive(await this.blogPostService.findAllPosts()),
         tags: await this.blogPostService.findTags(),
@@ -90,7 +90,7 @@ module.exports = class AdminController {
 
       res.render('admin-edit-post', {
         layout: 'summernote',
-        title: post.title,
+        title: 'Programming practicing',
         post,
         archive: createArchive(await this.blogPostService.findAllPosts()),
         tags,
@@ -122,7 +122,7 @@ module.exports = class AdminController {
     if (!correctSlug && title) slug = slugify(title)
     if (!slug.includes('-') && slug.length > 0) slug += '-'
 
-    let author;
+    let author = req.session.user.username;
     let activeSlugInDb = '';
     let isNewActiveSlugNeeded = 0
     let published_at = 0
@@ -132,9 +132,7 @@ module.exports = class AdminController {
       if (req.session.user.isAdmin === 1) {
         const postAuthor = await this.blogPostService.findAuthorOfPostById(id)
         author = postAuthor
-      } else {
-        author = req.session.user.username
-      }
+      } 
 
       // Check if the slug changed or is it exists at all?
 
